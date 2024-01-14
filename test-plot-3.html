@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+
+<head lang="en">
+  <title>JagaPlot</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+
+<svg id="canvas" style="width:1280px;height:480px;background:snow"></svg>
+
+
+<script type="module">
+    import { JG as $ } from './jagaimo.mjs';
+    import { JGPlot } from './jagaplot.mjs';
+
+    window.addEventListener('DOMContentLoaded', function() {
+        let graph = {
+            x: [],
+            y: [],
+            style: { 
+                markerSize:2, markerColor:'black', markerType:'circle',
+                lineWidth: 1, lineColor: 'black'
+            },
+        };
+        for (let i = 0; i < 100; i++) {
+            let x = 10 * (i/100.0);
+            let y = Math.exp(-0.1*x) * Math.sin(x);
+            graph.x.push(x);
+            graph.y.push(y);
+        }
+        
+        ///////
+        
+        let xmin = 0, xmax = 10, ymin = -1.5, ymax = 1.5;
+        
+        let plot1 = new JGPlot($('#canvas'), { grid: true });
+        let plot2 = new JGPlot($('#canvas'), { grid: true, x: 640, y: 240, width:640, height:240, ticksY:1});
+        plot1.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });
+        plot2.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });
+        plot1.setTitle('JagaPlot').setXTitle('X').setYTitle('Y');
+        plot2.setTitle('JagaPlot 2').setXTitle('X2').setYTitle('Y2');
+        plot1.drawGraph(graph);
+        plot2.drawGraph(graph);
+    });
+</script>
+</body>
+</html>
+    

@@ -1,0 +1,122 @@
+/* jagaimo.css */
+/* Author: Sanshiro Enomoto <sanshiro@uw.edu> */
+/* Created: 2 November 2017 */
+
+
+.jaga-tabFrame {
+    background: dimgray;
+    padding: 1px;
+    border-radius: 5px;
+}
+
+.jaga-tabLabelBox {
+    background: linear-gradient(lightgray, gray);
+    padding:5px;
+    border-radius: 5px 5px 0 0;
+}
+
+.jaga-tabLabel {
+    cursor: pointer;
+    border-top: thin solid black;
+    border-left: thin solid black;
+    border-right: thin solid black;
+    background: gainsboro;
+    padding: 5px;
+    border-radius: 5px 5px 0 0;
+    margin-right: 2px;
+}
+
+.jaga-tabLabel.selected {
+    background: white;
+}
+
+.jaga-tabPage {
+    width: fill;
+    height: calc(100% - 30px - 1em);
+    border: thin solid black;
+    background: white;
+    padding: 10px 2px 10px 2px;
+    border-radius: 0 0 5px 5px;
+}
+
+
+.jaga-popup {
+    border: thin solid black;
+    border-radius: 5px;
+    padding: 5px;
+    background: white;
+    box-shadow: 1px 1px 3px;
+}
+
+.jaga-dialog-title {
+    border: noe;
+    border-radius: 5px;
+    padding: 5px;
+    background: linear-gradient(#e0e0e0, #c0c0c0);
+    font-size: 140%;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.jaga-dialog-content {
+    padding: 5px;
+}
+
+.jaga-dialog-button-pane {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+}
+.jaga-dialog-button-pane button {
+    flex-basis: 20%;
+    font-size: 130%;
+    border-radius: 5px;
+    margin: 3px 0 3px 10px;
+    padding: 5px;
+    background: linear-gradient(#e0e0e0, #d0d0d0);
+    white-space: nowrap;
+}
+.jaga-dialog-button-pane button:hover {
+    background: linear-gradient(#f0f0f0, #e0e0e0);
+    cursor: pointer;
+}
+
+
+.jaga-menulist {
+    list-style-type: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+.jaga-menulist li a {
+    text-decoration: none;
+    color: black;
+}
+.jaga-menulist li:hover {
+    background: lightgray;
+}
+
+
+.jaga-inplet {
+    border: thin solid white;
+}
+.jaga-inplet-open {
+    border: thin solid orange;
+    border-radius: 4px;
+    box-shadow: inset 1px 1px 0 0;
+}
+.jaga-inpletLabel {
+    border: thin solid white;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 2px;
+}
+.jaga-inpletLabel:hover {
+    background: gainsboro;
+}
+.jaga-inpletFullLabel {
+    border: thin solid white;
+    cursor: pointer;
+    background: gainsboro;
+}

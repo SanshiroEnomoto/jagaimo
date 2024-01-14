@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+
+<head lang="en">
+  <title>Jagaimo Plot</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="jagaimo.css">
+</head>
+
+<body bgcolor="gray">
+
+<div id="plot" style="bgcolor:white"></div>
+<br>
+<button id="reset">Reset</button>
+<button id="print">Print</button>
+
+<script type="module">
+    import { JG as $ } from './jagaimo.mjs';
+    import { JGPlotWidget } from './jagaplot.mjs';
+
+    window.addEventListener('DOMContentLoaded', function() {
+        plot = new JGPlotWidget('#plot', {
+            width:640, height:480, 
+            bgcolor:"lightgray", plotcolor:"white",
+            grid: true,
+            cursorDigits: 5, plotDigits: 6,
+            rangeSelect: function(p, x0, x1, y0, y1)  {
+                p.setRange(x0, x1, y0, y1);
+                draw();
+            }
+        });
+
+        function draw() {
+            plot.setTitle("Jagaimo Plot");
+            plot.setXTitle("X Title").setYTitle("Y Title");
+            plot.setFootnote("Footnote");
+            plot.enableGrid();
+            
+            plot.drawRectangle({
+                x0: -3, x1: 3, 
+                style: {
+                    lineColor: null,
+                    fillColor:"lightgray",
+                    fillOpacity: 0.5
+                }
+            });
+            
+            let hist = {
+                bins: {min: -10, max: 10 },
+                counts: [],
+                style: {lineColor:'red', lineWidth:2, fillColor:'yellow', fillOpacity: 0.2}
+            }
+            for (let x = hist.bins.min; x < hist.bins.max; x += 1) {
+                hist.counts.push(0.1*x*x-8);
+            }
+            plot.drawHistogram(hist);
+            
+            let graph = {
+                x: [],
+                y: [],
+                style: { markerSize:5, markerColor:'blue', markerType:'circle' }
+            }
+            for (let x = -10; x < 10; x += 1) {
+                graph.x.push(x);
+                graph.y.push(0.1*x*x-7);
+            }
+            plot.drawGraph(graph);
+            
+            let func = {
+                func: x => 5*Math.sqrt(Math.sin(x)),
+                range: { min: -4, max: 8 }, 
+                style: {lineWidth:3, lineColor:'green'}
+            };
+            plot.drawFunction(func);
+            
+            plot.drawStat({
+                title: "this is a Stat Box",
+                contents: {
+                    Name: 'none', 
+                    Title: 'unknown'
+                }
+            });
+            //plot.enableStat(false);
+            
+            plot.drawText({
+                x: -3, y: -2,
+                text: '(-3, -2)'
+            });
+            
+            plot.drawLine({
+                x0: -3, y0: 2.5, x1: 3,
+                style: {
+                    lineWidth: 3,
+                    lineStyle: 'dot'
+                }
+            });
+        }
+        
+        function reset() {
+            plot.setRange(-10, 10, -10, 10, {ylog:false});
+            draw();
+        }
+        
+        $('#reset').click(function() {
+            reset();
+        });
+        $('#print').click(function() {
+            let svg = plot.svg.get().outerHTML;
+            const svgWidth = plot.svg.attr('width');
+            const svgHeight = plot.svg.attr('height');
+            let svgBlob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+            let svgUrl = URL.createObjectURL(svgBlob);
+            window.open(svgUrl);
+        });
+        
+        reset();
+    });
+</script>
+</body>
+</html>
