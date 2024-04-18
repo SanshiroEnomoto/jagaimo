@@ -4,7 +4,12 @@ JavaScript library for plotting and widgets
 ### Application Examples
 - [SlowDash](https://slowprojects.github.io/slowdash/)
 
-### Usage Examples
+
+### Usage
+
+#### Plotting
+<img src="test-plot-1.png" width="50%">
+
 ```html
 <div id="plotDiv" style="width:640px;height:480px"></div>
 
@@ -38,7 +43,5 @@ JavaScript library for plotting and widgets
     });
 </script>
 ```
-<img src="test-plot-1.png" width="70%">
 
-<p>
 For more examples, see `test-plot-?.html` files.
