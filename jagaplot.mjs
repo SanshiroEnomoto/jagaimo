@@ -917,7 +917,7 @@ export class JGPlotFrame {
         if (this.options.colorScale !== null) {
             const barWidth = this.options.colorBarWidth;
             this.options.marginRight += this.options.marginLeft + barWidth*2;
-            this.scaleZ = new JGPlotColorBarScale(0, 1, false, {
+            this.scaleZ = new JGPlotColorBarScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, {
                 x: this.geom.marginLeft + this.geom.frameWidth + 2*barWidth,
                 y: this.geom.marginTop,
                 length: this.geom.frameHeight,
@@ -926,8 +926,8 @@ export class JGPlotFrame {
                 labelPosition: 'right',
                 colorCoding: this.options.colorScale,
                 ticksOutwards: true,
-                frameColor: this.style.plotLabelColor, // LabelColor on purpose
-                labelColor: this.style.plotLabelColor,
+                frameColor: this.options.labelColor, // LabelColor on purpose
+                labelColor: this.options.labelColor,
                 title: '',
             });
         }
