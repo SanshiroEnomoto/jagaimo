@@ -5,4 +5,40 @@ JavaScript library for plotting and widgets
 - [SlowDash](https://slowprojects.github.io/slowdash/)
 
 ### Usage Examples
-see `test-plot-?.html` files
+```html
+<div id="plotDiv" style="width:640px;height:480px"></div>
+
+<script type="module">
+    import { JG as $ } from './jagaimo.mjs';
+    import { JGPlotWidget } from './jagaplot.mjs';
+
+    window.addEventListener('DOMContentLoaded', function() {
+        let plot = new JGPlotWidget($('#plotDiv'), { grid: true });
+        let graph = {
+            x: [], y: [],
+            style: { 
+                markerSize:3, markerColor:'orange', markerType:'circle',
+                lineWidth: 1, lineColor: 'darkgray'
+            },
+        };
+        
+        const xmin = 0, xmax = 10, ymin = -1.5, ymax = 1.5;
+        plot.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });
+        plot.setTitle('JagaPlot').setXTitle('X').setYTitle('Y');
+        plot.addGraph(graph);
+
+        // test-data
+        for (let i = 0; i < 100; i++) {
+            const xk = 10 * (i/100.0);
+            const yk = Math.exp(-0.1*xk) * Math.sin(xk);
+            graph.x.push(xk);
+            graph.y.push(yk);
+        }
+        plot.update();
+    });
+</script>
+```
+<img src="test-plot-1.png" width="70%">
+
+<p>
+For more examples, see `test-plot-?.html` files.

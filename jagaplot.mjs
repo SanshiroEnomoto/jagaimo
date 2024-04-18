@@ -956,11 +956,11 @@ export class JGPlotFrame {
     
     setRange(x0, x1, y0, y1, z0=null, z1=null, options={}) {
         const defaults = {
-            xlog: this.geom.xlog,
-            ylog: this.geom.ylog,
+            xlog: this.geom.xlog ?? false,
+            ylog: this.geom.ylog ?? false,
             zlog: this.geom.zlog ?? false,
-            grid: this.labels.grid,
-            stat: this.labels.stat
+            grid: this.labels.grid ?? false,
+            stat: this.labels.stat ?? false,
         };
         let opts = $.extend({}, defaults, options);
 
@@ -973,7 +973,7 @@ export class JGPlotFrame {
         this.geom.ymax = this.scaleY.max;
         this.geom.ylog = this.scaleY.isLog;
         if (this.scaleZ) {
-            this.scaleZ.setRange(z0, z1, opts.zlog);
+            this.scaleZ.setRange(z0 ?? this.geom.zmin, z1 ?? this.geom.zmax, opts.zlog);
             this.geom.zmin = this.scaleZ.min;
             this.geom.zmax = this.scaleZ.max;
             this.geom.zlog = this.scaleZ.isLog;
@@ -1899,12 +1899,12 @@ export class JGPlotWidget extends JGWidget {
             labelScaling: 1,
             x0: 0, x1: 1, y0: 0, y1: 1,           // initial coordinate
             dateFormat: null, logX: false, logY: false,
-            grid: false, stat: true, ticksX: 10, ticksY: 10,
             colorScale: null,
+            grid: false, stat: true, ticksX: 10, ticksY: 10,
             plotMarginColor: 'none', plotAreaColor: 'none',
-            frameColor: 'black', frameTickness: 2,
-            labelColor: null, gridColor: null,
-            marginTop: 32, marginRight: 20, marginBottom: 48, marginLeft: 72,
+            frameColor: 'black', frameThickness: 0, ticksOutwards: true,
+            labelColor: null, gridColor: 'gray',
+            marginTop: 32, marginRight: 20, marginBottom: 56, marginLeft: 88,
             plotDigits: 6,
             cursorDigits: 5,
             // callbacks //
@@ -1912,9 +1912,9 @@ export class JGPlotWidget extends JGWidget {
                 plotWidget.setRange(x0, x1, y0, y1);
             }
         };
-        if (options.ticksOutwards === true) {
-            defaults.marginBottom += 8;
-            defaults.marginLeft += 8;
+        if (options.ticksOutwards === false) {
+            defaults.marginBottom -= 8;
+            defaults.marginLeft -= 8;
         }
 
         super(obj, options);
@@ -1958,7 +1958,7 @@ export class JGPlotWidget extends JGWidget {
         this.options.height = viewHeight;
         this.options.labelScaling = undefined;
         this.plot = new JGPlot(this.svg, this.options);
-        this.drawables = [];
+        this.items = [];
         
         if (this.options.cursorDigits > 0) {
             this._setupCursorReader();
@@ -1989,35 +1989,22 @@ export class JGPlotWidget extends JGWidget {
         return this;
     }
 
-    update() {
-        for (let d of this.drawables) {
-            if (d.type == 'Graph') {
-                this.plot.drawGraph(d.obj);
-            }
-            else if (d.type == 'BarChart') {
-                this.plot.drawBarChart(d.obj);
-            }
-            else if (d.type == 'Histogram') {
-                this.plot.drawHistogram(d.obj);
-            }
-            else if (d.type == 'Histogram2d') {
-                this.plot.drawHistogram2d(d.obj);
-            }
-            else if (d.type == 'Function') {
-                this.plot.drawFunction(d.obj);
-            }
-        }
-    }
-    
-    clear(removeDrawables=true) {
-        if (removeDrawables) {
-            this.drawables = [];
+    clear(removeItems=true) {
+        if (removeItems) {
+            this.items = [];
         }
         this.plot.clear();
         this.obj.attr('cursorLabel', '');
         return this;        
     }
 
+    update() {
+        const range = this.plot.getRange();
+        this.plot.setRange(range.xmin, range.xmax, range.ymin, range.ymax, range.zmin, range.zmax, {});
+        this.plot.drawFrame();
+        this._drawItems();
+    }
+    
     getRange() {
         return this.plot.getRange();
     }
@@ -2025,7 +2012,7 @@ export class JGPlotWidget extends JGWidget {
     setRange(x0, x1, y0, y1, z0=null, z1=null, options={}) {
         this.plot.setRange(x0, x1, y0, y1, z0, z1, options);
         this.plot.drawFrame();
-        this.update();
+        this._drawItems();
         this.obj.attr('cursorLabel', '');
         return this;
     }
@@ -2075,41 +2062,79 @@ export class JGPlotWidget extends JGWidget {
         return this;
     }
 
-    addHistogram(hist) {
-        this.drawables.push({type: "Histogram", obj: hist}); // deep copy?
-        this.plot.drawHistogram(hist);
+    addHistogram(itemData) {
+        const drawer = data => { this.plot.drawHistogram(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
         return this;
     }
 
-    addHistogram2d(hist) {
-        this.drawables.push({type: "Histogram2d", obj: hist}); // deep copy?
-        this.plot.drawHistogram2d(hist);
+    addHistogram2d(itemData) {
+        const drawer = data => { this.plot.drawHistogram2d(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
         return this;
     }
 
-    addGraph(graph) {
-        this.drawables.push({type: "Graph", obj: graph}); // deep copy?
-        this.plot.drawGraph(graph);
+    addGraph(itemData) {
+        const drawer = data => { this.plot.drawGraph(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
         return this;
     }
 
-    addBarChart(graph) {
-        this.drawables.push({type: "BarChart", obj: graph}); // deep copy?
-        this.plot.drawBarChart(graph);
+    addBarChart(itemData) {
+        const drawer = data => { this.plot.drawBarChart(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
         return this;
     }
 
-    addFunction(func) {
-        this.drawables.push({type: "Function", obj: func}); // deep copy?
-        this.plot.drawFunction(func);
+    addFunction(itemData) {
+        const drawer = data => { this.plot.drawFunction(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
         return this;
     }
 
+    addStat(itemData) {
+        const drawer = data => { this.plot.drawStat(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
+        return this;
+    }
+    
+    addText(itemData) {
+        const drawer = data => { this.plot.drawText(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
+        return this;
+    }
+    
+    addLine(itemData) {
+        const drawer = data => { this.plot.drawLine(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
+        return this;
+    }
+    
+    addRectangle(itemData) {
+        const drawer = data => { this.plot.drawRectangle(data); };
+        this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
+        drawer(itemData);
+        return this;
+    }
+        
     drawHistogram(hist) {
         this.plot.drawHistogram(hist);
         return this;
     }
     
+    drawHistogram2d(hist) {
+        this.plot.drawHistogram2d(hist);
+        return this;
+    }
+
     drawGraph(graph) {
         this.plot.drawGraph(graph);
         return this;
@@ -2144,8 +2169,15 @@ export class JGPlotWidget extends JGWidget {
         this.plot.drawRectangle(rect);
         return this;
     }
-        
+
+    
     // internal methods //
+    
+    _drawItems() {
+        for (let item of this.items) {
+            item.drawer(item.data);
+        }
+    }
     
     static _screen2CanvasXY(x, y, svg, dom) {
         function transformFromViewport(domPoint, dom) {
@@ -2381,7 +2413,7 @@ export class JGPlotWidget extends JGWidget {
                 geom.xmax = Math.max(px0, px1);
                 geom.ymin = Math.min(py0, py1);
                 geom.ymax = Math.max(py0, py1);
-                this.update();
+                this._drawItems();
             }
             else {
                 this.setRange(px0, px1, py0, py1);

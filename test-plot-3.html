@@ -16,14 +16,17 @@
     import { JGPlot } from './jagaplot.mjs';
 
     window.addEventListener('DOMContentLoaded', function() {
+        let plot1 = new JGPlot($('#canvas'), { grid: true });
+        let plot2 = new JGPlot($('#canvas'), { grid: true, x: 640, y: 240, width:640, height:240, ticksY:1});
         let graph = {
-            x: [],
-            y: [],
+            x: [], y: [],
             style: { 
                 markerSize:2, markerColor:'black', markerType:'circle',
                 lineWidth: 1, lineColor: 'black'
             },
         };
+        
+        // test-data
         for (let i = 0; i < 100; i++) {
             let x = 10 * (i/100.0);
             let y = Math.exp(-0.1*x) * Math.sin(x);
@@ -31,12 +34,9 @@
             graph.y.push(y);
         }
         
-        ///////
+        // drawing 
         
         let xmin = 0, xmax = 10, ymin = -1.5, ymax = 1.5;
-        
-        let plot1 = new JGPlot($('#canvas'), { grid: true });
-        let plot2 = new JGPlot($('#canvas'), { grid: true, x: 640, y: 240, width:640, height:240, ticksY:1});
         plot1.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });
         plot2.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });
         plot1.setTitle('JagaPlot').setXTitle('X').setYTitle('Y');
