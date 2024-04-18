@@ -1,17 +1,25 @@
-<!DOCTYPE HTML>
-<html>
+# jagaimo
+JavaScript library for plotting and widgets
 
-<head lang="en">
-  <title>JagaPlot</title>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-</head>
-<body>
+## Application Examples
+#### SlowDash
+<img src="https://slowproj.github.io/slowdash/fig/Gallery-PlotDemo.png" width="70%">
 
+[https://slowproj.github.io/slowdash/](https://slowproj.github.io/slowdash/)
+
+## Usage
+
+#### Plotting
+Example from `test-plot-1.html`
+
+<img src="test-plot-1.png" width="50%">
+
+```html
 <div id="plotDiv" style="width:640px;height:480px"></div>
 
 <script type="module">
-    import { JG as $ } from './jagaimo.mjs';
-    import { JGPlotWidget } from './jagaplot.mjs';
+    import { JG as $ } from './jagaimo/jagaimo.mjs';
+    import { JGPlotWidget } from './jagaimo/jagaplot.mjs';
 
     window.addEventListener('DOMContentLoaded', function() {
         let plot = new JGPlotWidget($('#plotDiv'), { grid: true });
@@ -38,5 +46,6 @@
         plot.update();
     });
 </script>
-</body>
-</html>
+```
+
+For more examples, see `test-plot-?.html` files.
