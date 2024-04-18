@@ -1,13 +1,17 @@
 # jagaimo
 JavaScript library for plotting and widgets
 
-### Application Examples
-- [SlowDash](https://slowprojects.github.io/slowdash/)
+## Application Examples
+#### SlowDash
+<img src="https://slowproj.github.io/slowdash/fig/Gallery-PlotDemo.png" width="70%">
 
+[https://slowproj.github.io/slowdash/](https://slowproj.github.io/slowdash/)
 
-### Usage
+## Usage
 
 #### Plotting
+Example from `test-plot-1.html`
+
 <img src="test-plot-1.png" width="50%">
 
 ```html
