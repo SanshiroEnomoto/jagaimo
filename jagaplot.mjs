@@ -1540,7 +1540,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                 fillPathData.push({type: 'L', values: [cx_end, cy_base]});
             }
             else {
-                fillPathData.push({type: 'L', values: [cx0, cy_base]});
+                fillPathData.push({type: 'L', values: [cx, cy_base]});
             }
             JGPlot._setPathData(filling, fillPathData, this.options.plotDigits);
         }
