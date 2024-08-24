@@ -1365,6 +1365,10 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         let objgroup = $('<g>', 'svg').appendTo(plottingarea);
         let geom = this.geom;
 
+        if (x.length <= 0) {
+            return;
+        }
+        
         let drawMarker = null;
         if ((style.markerColor !== '') && (parseInt(style.markerSize) > 0) && (parseFloat(style.markerOpacity) > 0)) {
             let fill = style.markerColor, stroke = 'none', opacity = style.markerOpacity;
@@ -1424,37 +1428,37 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                 }
             }
         }
-        else {
+
+        let filling = null;
+        if ((style.fillColor !== '') && (parseFloat(style.fillOpacity) > 0)) {
+            filling = $('<path>', 'svg').appendTo(objgroup).get();
+            filling.style.setProperty('stroke', 'none');
+            filling.style.setProperty('fill', style.fillColor);
+            filling.style.setProperty('fill-opacity', style.fillOpacity);
+        }
+
+        if ((drawMarker === null) && (filling === null)) {
             if (style.lineColor === '') {
                 style.lineColor = 'black';
             }
-            if (style.lineWidth <= 0) {
+            if (! (parseFloat(style.lineWidth) > 0)) {
                 style.lineWidth = 1;
             }
         }
-
-        let path = null;
-        if (
-            ((style.lineColor !== '') && (parseFloat(style.lineWidth) > 0)) ||
-            ((style.fillColor !== '') && (parseFloat(style.fillOpacity) > 0)) 
-        ){
-            path = $('<path>', 'svg').appendTo(objgroup).get();
-            path.style.setProperty('stroke', style.lineColor);
-            path.style.setProperty('stroke-width', style.lineWidth);
-            if (style.fillOpacity > 0) {
-                path.style.setProperty('fill', style.fillColor);
-                path.style.setProperty('fill-opacity', style.fillOpacity);
-            }
-            else {
-                path.style.setProperty('fill', 'none');
-            }
+        
+        let line = null;
+        if ((style.lineColor !== '') && (parseFloat(style.lineWidth) > 0)) {
+            line = $('<path>', 'svg').appendTo(objgroup).get();
+            line.style.setProperty('stroke', style.lineColor);
+            line.style.setProperty('stroke-width', style.lineWidth);
+            line.style.setProperty('fill', 'none');
             if ((style.lineStyle == 'dot') || (style.lineStyle == 'dotted')) {
-                path.style.setProperty('stroke-dasharray', 2);
+                line.style.setProperty('stroke-dasharray', 2);
             }
         }
 
-        let pathData = [];
-        let cx0 = null, cy0 = null;
+        let linePathData = [], fillPathData = [];
+        let cx0, cy0, cx = null, cy = null;
         const cy_base = this._cy(parseFloat(style.fillBaseline));
         for (let i = 0; i < x.length; i++) {
             if (isNaN(x[i]) || (geom.xlog && (x[i] <= 0))) {
@@ -1463,35 +1467,39 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             if (isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
                 continue;
             }
-            const cx = this._cx(x[i]);
-            const cy = this._cy(y[i]);
+            cx0 = cx;
+            cy0 = cy;
+            cx = this._cx(x[i]);
+            cy = this._cy(y[i]);
 
-            if (path) {
+            if (line) {
                 if ((cx0 === null) || (cy0 === null)) {
-                    if (style.fillOpacity > 0) {
-                        pathData.push({type: 'M', values: [cx, cy_base]});
-                        pathData.push({type: 'L', values: [cx, cy]});
-                    }
-                    else {
-                        pathData.push({type: 'M', values: [cx, cy]});
-                    }
+                    linePathData.push({type: 'M', values: [cx, cy]});
                 }
                 else {
                     if (style.lineType == 'last') {
-                        if (style.fillOpacity > 0) {
-                            pathData.push({type: 'L', values: [cx0, cy0]});
-                        }
-                        else {
-                            pathData.push({type: 'M', values: [x0, cy0]});
-                        }
-                        pathData.push({type: 'L', values: [cx, cy0]});
+                        linePathData.push({type: 'L', values: [cx, cy0]});
+                        linePathData.push({type: 'M', values: [cx, cy]});
                     }
                     else {
-                        pathData.push({type: 'L', values: [cx, cy]});
+                        linePathData.push({type: 'L', values: [cx, cy]});
                     }
                 }
-                cx0 = cx;
-                cy0 = cy;
+            }
+            if (filling) {
+                if ((cx0 === null) || (cy0 === null)) {
+                    fillPathData.push({type: 'M', values: [cx, cy_base]});
+                    fillPathData.push({type: 'L', values: [cx, cy]});
+                }
+                else {
+                    if (style.lineType == 'last') {
+                        fillPathData.push({type: 'L', values: [cx, cy0]});
+                        fillPathData.push({type: 'L', values: [cx, cy]});
+                    }
+                    else {
+                        fillPathData.push({type: 'L', values: [cx, cy]});
+                    }
+                }
             }
             if (drawMarker) {
                 drawMarker(objgroup, cx, cy);
@@ -1515,11 +1523,26 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                 });
             }
         }
-        if (path) {
-            if (style.fillOpacity > 0) {
-                pathData.push({type: 'L', values: [cx0, cy_base]});
+
+        let cx_end = this._cx(this.geom.xmax);
+        if (cx0 !== null) {
+            cx_end = Math.min(cx_end, cx+(cx-cx0));
+        }
+        if (line) {
+            if (style.lineType == 'last') {
+                linePathData.push({type: 'L', values: [cx_end, cy]});
             }
-            JGPlot._setPathData(path, pathData, this.options.plotDigits);
+            JGPlot._setPathData(line, linePathData, this.options.plotDigits);
+        }
+        if (filling) {
+            if (style.lineType == 'last') {
+                fillPathData.push({type: 'L', values: [cx_end, cy]});
+                fillPathData.push({type: 'L', values: [cx_end, cy_base]});
+            }
+            else {
+                fillPathData.push({type: 'L', values: [cx0, cy_base]});
+            }
+            JGPlot._setPathData(filling, fillPathData, this.options.plotDigits);
         }
 
         return this;
