@@ -875,6 +875,7 @@ export class JGPlotFrame {
         this.style = {
             lineColor: 'black',
             lineWidth: 1,
+            lineOpacity: 1,
             lineStyle: 'solid',
             fillColor: '',
             fillOpacity: 1,
@@ -1230,6 +1231,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             lineColor: this.style.lineColor,
             lineWidth: this.style.lineWidth,
             lineStyle: this.style.lineStyle,
+            lineOpacity: this.style.lineOpacity,
             fillColor: this.style.fillColor,
             fillOpacity: this.style.fillOpacity,
         };
@@ -1346,6 +1348,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             lineColor: this.style.lineColor,
             lineWidth: this.style.lineWidth,
             lineStyle: this.style.lineStyle,
+            lineOpacity: this.style.lineOpacity,
             markerColor: this.style.markerColor,
             markerOpacity: this.style.markerOpacity,
             markerSize: this.style.markerSize,
@@ -1451,6 +1454,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             line = $('<path>', 'svg').appendTo(objgroup).get();
             line.style.setProperty('stroke', style.lineColor);
             line.style.setProperty('stroke-width', style.lineWidth);
+            line.style.setProperty('stroke-opacity', style.lineOpacity);
             line.style.setProperty('fill', 'none');
             if ((style.lineStyle == 'dot') || (style.lineStyle == 'dotted')) {
                 line.style.setProperty('stroke-dasharray', 2);
@@ -1802,6 +1806,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             lineColor: this.style.lineColor,
             lineWidth: this.style.lineWidth,
             lineStyle: this.style.lineStyle,
+            lineOpacity: this.style.lineOpacity,
         };
         let style = $.extend({}, defaultStyle, line.style);
 
@@ -1844,7 +1849,8 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             x2: this._cx(x1).toPrecision(this.options.plotDigits), 
             y2: this._cy(y1).toPrecision(this.options.plotDigits),
             'stroke': style.lineColor,
-            'stroke-width': style.lineWidth
+            'stroke-width': style.lineWidth,
+            'stroke-opacity': style.lineOpacity
         });
         if ((style.lineStyle == 'dot') || (style.lineStyle == 'dotted')) {
             elem.attr('stroke-dasharray', 2);
@@ -1861,6 +1867,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             lineColor: this.style.lineColor,
             lineWidth: this.style.lineWidth,
             lineStyle: this.style.lineStyle,
+            lineOpacity: this.style.lineOpacity,
             fillColor: this.style.fillColor,
             fillOpacity: this.style.fillOpacity
         };
@@ -1900,8 +1907,9 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             x: cx, y: cy, width: width, height: height
         });
         if ((style.lineColor !== '') && (parseFloat(style.lineWidth) > 0)) {
-                elem.get().style.setProperty('stroke', style.lineColor);
+            elem.get().style.setProperty('stroke', style.lineColor);
             elem.get().style.setProperty('stroke-width', style.lineWidth);
+            elem.get().style.setProperty('stroke-opacity', style.lineOpacity);
         }
         if (style.fillColor !== '') {
             elem.get().style.setProperty('fill', style.fillColor);
