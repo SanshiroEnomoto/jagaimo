@@ -1479,7 +1479,12 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                 else {
                     if (style.lineType == 'last') {
                         linePathData.push({type: 'L', values: [cx, cy0]});
-                        linePathData.push({type: 'M', values: [cx, cy]});
+                        if (filling) {
+                            linePathData.push({type: 'M', values: [cx, cy]});
+                        }
+                        else {
+                            linePathData.push({type: 'L', values: [cx, cy]});
+                        }
                     }
                     else {
                         linePathData.push({type: 'L', values: [cx, cy]});
