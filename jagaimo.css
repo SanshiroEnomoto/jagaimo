@@ -97,26 +97,48 @@
 }
 
 
-.jaga-inplet {
-    border: thin solid white;
+.jaga-fileicon {
+    width: 7rem;
+    display: inline-block;
 }
-.jaga-inplet-open {
-    border: thin solid orange;
-    border-radius: 4px;
-    box-shadow: inset 1px 1px 0 0;
-}
-.jaga-inpletLabel {
-    border: thin solid white;
+.jaga-fileicon:hover {
+    background: linear-gradient(#f0f0f0, #e0e0e0);
     cursor: pointer;
+}
+.jaga-fileicon-icon {
+    width: 5rem;
+    height: 3rem;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    padding-top: 0.5rem;
+    overflow: hidden;
+    background-color: dakyellow;
+    border-radius: 5px;
+    border: 1px solid gray;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    font-size: 120%;
+    font-weight: bold;
+    text-align: center;
+}
+.jaga-fileicon-icon::first-letter {
+    font-size: 150%;
+}
+.jaga-fileicon-icon::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background-color: gray;
+    position: absolute;
+    top: 0;
+    right: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    box-shadow: -2px 2px 2px rgba(0,0,0,0.1);
+}
+.jaga-fileicon-label {
+    margin-top: 0.3rem;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-left: 2px;
-}
-.jaga-inpletLabel:hover {
-    background: gainsboro;
-}
-.jaga-inpletFullLabel {
-    border: thin solid white;
-    cursor: pointer;
-    background: gainsboro;
+    text-align: center;
 }

@@ -691,3 +691,22 @@ export class JGIndicatorWidget extends JGWidget {
         }, duration_ms);
     }
 };
+
+
+export class JGFileIconWidget extends JGWidget {
+    constructor(obj, options={}) {
+        const defaults = {
+            filetype: '',
+        };
+        
+        super(obj, options);
+        this.options = $.extend({}, defaults, options);
+        this.label = this.obj.text();
+        this.obj.attr({'title': this.label});
+
+        this.obj.addClass('jaga-fileicon').html(`
+            <div class="jaga-fileicon-icon">${this.options.filetype}</div>
+            <div class="jaga-fileicon-label">${this.label}</div>
+        `);
+    }
+};
