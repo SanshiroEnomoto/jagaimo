@@ -697,6 +697,7 @@ export class JGFileIconWidget extends JGWidget {
     constructor(obj, options={}) {
         const defaults = {
             filetype: '',
+            badge: '',
         };
         
         super(obj, options);
@@ -708,5 +709,8 @@ export class JGFileIconWidget extends JGWidget {
             <div class="jaga-fileicon-icon">${this.options.filetype}</div>
             <div class="jaga-fileicon-label">${this.label}</div>
         `);
+        if (this.options.badge != '') {
+            this.obj.append($('<div>').addClass('jaga-fileicon-badge').html(this.options.badge));
+        }
     }
 };
