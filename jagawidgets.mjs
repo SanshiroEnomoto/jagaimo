@@ -568,7 +568,57 @@ export class JGPullDownWidget extends JGWidget {
 };
 
 
-export class JGHiddenWidget extends JGWidget {
+// hide by "display: none"; unlike InvisibleWidget, this is not "found" by mouseenter etc.
+export class JGHiddenWidget extends JGWidget {   
+    constructor(obj, options={}) {
+        const defaults = {
+            sensingObj: obj,
+            group: null,
+            opacity: 1,
+            autoHide: 0,
+        };
+        super(obj, options);
+        this.options = $.extend({}, defaults, options);
+        
+        this.options.sensingObj.bind('pointerenter', e=>{this.hideAll(); this.show()});
+        this.options.sensingObj.bind('mouseleave', e=>this.hide());
+
+        this.hide();
+        this.timeoutId = null;
+    }
+    
+    hide() {
+        this.obj.css({display: 'none'});
+    }
+
+    hideAll() {
+        const group = this.options.group;
+        if (group) {
+            $(`.jaga-hiddenWidget-${group}`).removeClass(`jaga-hiddenWidget-${group}`).css({
+                display: 'none',
+            });
+        }
+    }
+    
+    show() {
+        const group = this.options.group;
+        if (group) {
+            this.obj.addClass(`jaga-hiddenWidget-${group}`);
+        }
+        this.obj.css({'display': 'block'});
+        if (parseFloat(this.options.autoHide) > 0) {
+            if (this.timeoutId) {
+                clearTimeout(this.timeoutId);
+            }
+            this.timeoutId = setTimeout(()=>{this.hide()}, 1000*parseFloat(this.options.autoHide));
+        }
+    }
+};
+
+
+
+// hide by "opacity: 0"; unlike HiddenWidget, this does not change the layout when shown
+export class JGInvisibleWidget extends JGWidget {
     constructor(obj, options={}) {
         const defaults = {
             sensingObj: obj,
@@ -597,7 +647,7 @@ export class JGHiddenWidget extends JGWidget {
     hideAll() {
         const group = this.options.group;
         if (group) {
-            $(`.jaga-hiddenWidget-${group}`).removeClass(`jaga-hiddenWidget-${group}`).css({
+            $(`.jaga-invisibleWidget-${group}`).removeClass(`jaga-invisibleWidget-${group}`).css({
                 filter: 'alpha(opacity=0)',
                 opacity: 0,
                 '-moz-opacity': 0,
@@ -608,7 +658,7 @@ export class JGHiddenWidget extends JGWidget {
     show() {
         const group = this.options.group;
         if (group) {
-            this.obj.addClass(`jaga-hiddenWidget-${group}`);
+            this.obj.addClass(`jaga-invisibleWidget-${group}`);
         }
         this.obj.css({
             filter: 'alpha(opacity=' + this.options.opacity + ')',
@@ -698,12 +748,12 @@ export class JGFileIconWidget extends JGWidget {
         const defaults = {
             filetype: '',
             badge: '',
+            back: '',
         };
         
         super(obj, options);
         this.options = $.extend({}, defaults, options);
         this.label = this.obj.text();
-        this.obj.attr({'title': this.label});
 
         this.obj.addClass('jaga-fileicon').html(`
             <div class="jaga-fileicon-icon">${this.options.filetype}</div>
@@ -711,6 +761,9 @@ export class JGFileIconWidget extends JGWidget {
         `);
         if (this.options.badge != '') {
             this.obj.append($('<div>').addClass('jaga-fileicon-badge').html(this.options.badge));
+        }
+        if (this.options.back != '') {
+            this.obj.append($('<div>').addClass('jaga-fileicon-back').html(this.options.back));
         }
     }
 };

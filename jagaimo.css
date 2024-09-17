@@ -145,10 +145,21 @@
     text-align: center;
     line-height: 1.2;
     text-overflow: ellipsis;
+    z-index: 900;
 }
 .jaga-fileicon-badge {
     position: absolute;
     top: 0.2em;
     left: 1.2em;
     font-size: 130%;
+}
+.jaga-fileicon-back {
+    position: absolute;
+    top: 0.5em;
+    height: 2.0em;
+    width: 100%;
+    text-align: center;
+    font-size: 250%;
+    white-space: nowrap;
+    filter: opacity(15%) grayscale(90%);
 }
