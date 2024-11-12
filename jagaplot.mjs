@@ -14,7 +14,7 @@ export class JGPlotAxisScale {
             x: 0, y: 0, length: 100, // axis position in parent coordinate
             labelPosition: 'bottom',   // left, right, top (up), bottom (down)
             labelMargin: null, // null => auto
-            ticksOutwards: false,
+            ticksOutwards: true,
             dateFormat: null, 
             numberOfTicks: 5,
             title: '',
@@ -798,7 +798,7 @@ export class JGPlotFrame {
             x: 0, y: 0, width: 640, height: 480,  // in parent coordinate
             x0: 0, x1: 1, y0: 0, y1: 1,           // initial coordinate
             dateFormat: null, logX: false, logY: false,
-            grid: false, stat: true, ticksX: 10, ticksY: 10, ticksOutwards: false,
+            grid: false, stat: true, ticksX: 10, ticksY: 10, ticksOutwards: true,
             z0: 0, z1: 1, ticksZ: 10, colorScale: null,
             plotMarginColor: 'none', plotAreaColor: 'none',
             frameColor: 'black', frameThickness: 2, axisThickness: 1,
