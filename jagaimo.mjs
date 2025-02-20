@@ -229,6 +229,9 @@ export class JGElement {
                     return false;
                 }
             }
+            else if (['RANGE'].includes(inputType)) {
+                return this.elem[0].valueAsNumber;
+            }
             else {   
                 return this.elem[0].value;
             }
