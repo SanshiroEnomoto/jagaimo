@@ -99,7 +99,7 @@ export class JGElement {
             }
         }
         else if (query[0] == '.') {
-            if (this.elem[0].classList.contains(query.substr(1))) {
+            if (this.elem[0].classList?.contains(query.substr(1))) {
                 return this;
             }
         }
