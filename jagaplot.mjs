@@ -544,7 +544,7 @@ export class JGPlotAxisScale {
             let ytitle = $('<text>', 'svg').appendTo(yaxis).attr({
                 'font-family': 'sans-serif',
                 'font-size': '16px',
-                'fill': config.labelcolor,
+                'fill': config.labelColor,
             }).text(config.title);            
             let ylabels = $('<g>', 'svg').appendTo(yaxis).attr({
                 'font-family': 'sans-serif',
