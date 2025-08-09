@@ -1344,6 +1344,8 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         const x = (graph.x?.length == y.length) ? graph.x : [... Array(y.length)].map((_, i)=>i);
         const xerr = (graph.x_err?.length == x.length) ? graph.x_err : null;
         const yerr = (graph.y_err?.length == y.length) ? graph.y_err : null;
+        const ylow = (graph.y_min?.length == y.length) ? graph.y_min : null;
+        const yhigh = (graph.y_max?.length == y.length) ? graph.y_max : null;
         const defaultStyle = {
             lineColor: this.style.lineColor,
             lineWidth: this.style.lineWidth,
@@ -1355,6 +1357,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             markerType: this.style.markerType,
             fillColor: this.style.lineColor,
             fillOpacity: 0,
+            fillEnvelope: false,
             fillBaseline: 1e-100,
             lineType: 'connect',
         };
@@ -1461,7 +1464,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             }
         }
 
-        let linePathData = [], fillPathData = [];
+        let linePathData = [], fillPathData = [], lowPathData = [], highPathData = [];
         let cx0, cy0, cx = null, cy = null;
         const cy_base = this._cy(parseFloat(style.fillBaseline));
         for (let i = 0; i < x.length; i++) {
@@ -1512,24 +1515,37 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             }
             if (drawMarker) {
                 drawMarker(objgroup, cx, cy);
-            }
-            if (xerr && ! isNaN(xerr[i]) && (xerr[i] > 0)) {
-                const cxl = this._cx(x[i] - xerr[i]);
-                const cxu = this._cx(x[i] + xerr[i]);
-                $('<line>', 'svg').appendTo(objgroup).attr({
-                    x1: cxl, y1: cy, x2: cxu, y2: cy,
-                    stroke: style.markerColor,
-                    'stroke-width': Math.max(1, style.markerSize / 2),
+                
+                // error bars are enabled only with markers
+                if (xerr && ! isNaN(xerr[i]) && (xerr[i] > 0)) {
+                    const cxl = this._cx(x[i] - xerr[i]);
+                    const cxu = this._cx(x[i] + xerr[i]);
+                    $('<line>', 'svg').appendTo(objgroup).attr({
+                        x1: cxl, y1: cy, x2: cxu, y2: cy,
+                        stroke: style.markerColor,
+                        'stroke-width': Math.max(1, style.markerSize / 2),
                 });
+                }
+                if (yerr && ! isNaN(yerr[i]) && (yerr[i] > 0)) {
+                    let cyl = this._cy(y[i] - yerr[i]);
+                    let cyu = this._cy(y[i] + yerr[i]);
+                    $('<line>', 'svg').appendTo(objgroup).attr({
+                        x1: cx, y1: cyl, x2: cx, y2: cyu,
+                        stroke: style.markerColor,
+                        'stroke-width': Math.max(1, style.markerSize / 2),
+                    });
+                }
             }
-            if (yerr && ! isNaN(yerr[i]) && (yerr[i] > 0)) {
-                let cyl = this._cy(y[i] - yerr[i]);
-                let cyu = this._cy(y[i] + yerr[i]);
-                $('<line>', 'svg').appendTo(objgroup).attr({
-                    x1: cx, y1: cyl, x2: cx, y2: cyu,
-                    stroke: style.markerColor,
-                    'stroke-width': Math.max(1, style.markerSize / 2),
-                });
+            // min-max envelope
+            if (ylow && yhigh && (style.lineType != 'last')) {
+                if (lowPathData.length == 0) {
+                    lowPathData.push({type: 'M', values: [cx, this._cy(ylow[i])] });
+                    highPathData.push({type: 'L', values: [cx, this._cy(yhigh[i])] });
+                }
+                else {
+                    lowPathData.push({type: 'L', values: [cx, this._cy(ylow[i])] });
+                    highPathData.push({type: 'L', values: [cx, this._cy(yhigh[i])] });
+                }
             }
         }
 
@@ -1544,14 +1560,21 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             JGPlot._setPathData(line, linePathData, this.options.plotDigits);
         }
         if (filling) {
-            if (style.lineType == 'last') {
-                fillPathData.push({type: 'L', values: [cx_end, cy]});
-                fillPathData.push({type: 'L', values: [cx_end, cy_base]});
+            if (style.fillEnvelope) {
+                highPathData.reverse();
+                lowPathData.push(...highPathData);
+                JGPlot._setPathData(filling, lowPathData, this.options.plotDigits);
             }
             else {
-                fillPathData.push({type: 'L', values: [cx, cy_base]});
+                if (style.lineType == 'last') {
+                    fillPathData.push({type: 'L', values: [cx_end, cy]});
+                    fillPathData.push({type: 'L', values: [cx_end, cy_base]});
+                }
+                else {
+                    fillPathData.push({type: 'L', values: [cx, cy_base]});
+                }
+                JGPlot._setPathData(filling, fillPathData, this.options.plotDigits);
             }
-            JGPlot._setPathData(filling, fillPathData, this.options.plotDigits);
         }
 
         return this;
