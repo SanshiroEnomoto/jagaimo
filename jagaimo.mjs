@@ -251,7 +251,17 @@ export class JGElement {
                 }
             }
             else {   
-                e.value = str;
+                const inputType = (this.elem[0].getAttribute('type') ?? '').toUpperCase();
+                if ((inputType == 'COLOR') && (str.startsWith('rgb'))) {
+                    // convert "rgb(r,g,b)" to "#RRGGBB"
+                    const rgb = str.match(/\d+/g);
+                    if (rgb && (rgb.length >= 3)) {
+                        e.value = '#' + rgb.slice(0,3).map(Number).map(x=>x.toString(16).padStart(2,'0')).join('');
+                    }
+                }
+                else {
+                    e.value = str;
+                }
             }
         }
         return this;
