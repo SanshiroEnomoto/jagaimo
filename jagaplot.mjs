@@ -1468,10 +1468,10 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         let cx0, cy0, cx = null, cy = null;
         const cy_base = this._cy(parseFloat(style.fillBaseline));
         for (let i = 0; i < x.length; i++) {
-            if (isNaN(x[i]) || (geom.xlog && (x[i] <= 0))) {
+            if ((x[i] === null) || isNaN(x[i]) || (geom.xlog && (x[i] <= 0))) {
                 continue;
             }
-            if (isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
+            if ((x[i] === null) || isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
                 continue;
             }
             cx0 = cx;
@@ -1517,7 +1517,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                 drawMarker(objgroup, cx, cy);
                 
                 // error bars are enabled only with markers
-                if (xerr && ! isNaN(xerr[i]) && (xerr[i] > 0)) {
+                if (xerr && (xerr[i] !== null) && ! isNaN(xerr[i]) && (xerr[i] > 0)) {
                     const cxl = this._cx(x[i] - xerr[i]);
                     const cxu = this._cx(x[i] + xerr[i]);
                     $('<line>', 'svg').appendTo(objgroup).attr({
@@ -1526,7 +1526,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                         'stroke-width': Math.max(1, style.markerSize / 2),
                 });
                 }
-                if (yerr && ! isNaN(yerr[i]) && (yerr[i] > 0)) {
+                if (yerr && (yerr[i] !== null) && ! isNaN(yerr[i]) && (yerr[i] > 0)) {
                     let cyl = this._cy(y[i] - yerr[i]);
                     let cyu = this._cy(y[i] + yerr[i]);
                     $('<line>', 'svg').appendTo(objgroup).attr({
@@ -1617,10 +1617,10 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
 
         const [yc_min, yc_max] = [this._cy(this.geom.ymax), this._cy(this.geom.ymin)]
         for (let i = 0; i < x.length; i++) {
-            if (isNaN(x[i]) || (geom.xlog && (x[i] <= 0))) {
+            if ((x[i] === null) || isNaN(x[i]) || (geom.xlog && (x[i] <= 0))) {
                 continue;
             }
-            if (isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
+            if ((y[i] === null) || isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
                 continue;
             }
             let x0 = this._cx(x[i]-width/2);
@@ -1699,7 +1699,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             let pathData = [];
             while (i < x.length) {
                 const xk = x[i], yk = y[i]; i++;
-                if (isNaN(xk) || isNaN(yk)) {
+                if ((xk === null) || (yk === null) || isNaN(xk) || isNaN(yk)) {
                     break;
                 }
                 if ((xk < rangeMin) || (xk > rangeMax)) {
