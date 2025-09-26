@@ -1471,7 +1471,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             if ((x[i] === null) || isNaN(x[i]) || (geom.xlog && (x[i] <= 0))) {
                 continue;
             }
-            if ((x[i] === null) || isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
+            if ((y[i] === null) || isNaN(y[i]) || (geom.ylog && (y[i] <= 0))) {
                 continue;
             }
             cx0 = cx;
