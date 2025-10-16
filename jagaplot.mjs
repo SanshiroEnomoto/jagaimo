@@ -1551,7 +1551,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
 
         let cx_end = this._cx(this.geom.xmax);
         if (cx0 !== null) {
-            cx_end = Math.min(cx_end, cx+(cx-cx0));
+            // cx_end = Math.min(cx_end, cx+(cx-cx0));
         }
         if (line) {
             if (style.lineType == 'last') {
