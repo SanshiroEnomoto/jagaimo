@@ -807,12 +807,11 @@ export class JGPlotFrame {
             colorBarWidth: 20,
             plotDigits: 6,
         };
-        if (options.ticksOutwards === true) {
-            defaults.marginBottom += 8;
-            defaults.marginLeft += 8;
-        }
-        
         this.options = $.extend({}, defaults, options);
+        if (this.options.ticksOutwards === true) {
+            this.options.marginBottom += 8;
+            this.options.marginLeft += 8;
+        }
         
         if (this.options.colorScale !== null) {
             if ((this.options.colorScale === "") || (this.options.colorScale.toLowerCase() == "none")) {
@@ -1971,11 +1970,7 @@ export class JGPlotWidget extends JGWidget {
                 plotWidget.setRange(x0, x1, y0, y1);
             }
         };
-        if (options.ticksOutwards === false) {
-            defaults.marginBottom -= 8;
-            defaults.marginLeft -= 8;
-        }
-
+        
         super(obj, options);
         this.options = $.extend({}, defaults, options);
         this.obj.addClass('jagaplot-plotWidet');
@@ -2015,7 +2010,6 @@ export class JGPlotWidget extends JGWidget {
 
         this.options.width = viewWidth;
         this.options.height = viewHeight;
-        this.options.labelScaling = undefined;
         this.plot = new JGPlot(this.svg, this.options);
         this.items = [];
         
