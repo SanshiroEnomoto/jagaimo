@@ -55,7 +55,7 @@ export class JGTabWidget extends JGWidget {
         
         super(obj, options);
         this.options = $.extend({}, defaults, options);
-        this.obj.addClass('jaga-tabWidet');
+        this.obj.addClass('jaga-tabWidget');
 
         let labelbox = $('<div>').addClass('jaga-tabLabelBox');
         this.obj.prepend(labelbox);
@@ -67,7 +67,7 @@ export class JGTabWidget extends JGWidget {
             labelbox.append(label);
             label.text(this.pages.at(pageNumber).attr('label'));
             label.click(e => this.openPage($(e.target).closest('.jaga-tabLabel').text()));
-            label.onkeypress = (e => e.target.click());
+            label.get().onkeypress = (e => e.target.click());
             label.attr({'tabindex': '0'});
         }
         this.labels = labelbox.find('.jaga-tabLabel');
@@ -116,7 +116,7 @@ export class JGTabWidget extends JGWidget {
     }
 
     appendPage(label) {
-        let newPage = $('<div>').addClass('jaga-tabPage').attr('label', label).text("hello");;
+        let newPage = $('<div>').addClass('jaga-tabPage').attr('label', label).text("hello");
         this.obj.append(newPage);
         this.pages = this.obj.find('.jaga-tabPage');
         
@@ -135,9 +135,10 @@ export class JGTabWidget extends JGWidget {
     removePage(page=null) {
         let currentPage = null;
         for (let i = 0; i < this.pages.length; i++) {
-            this.labels.at(i).hasClass('selected');
-            currentPage = i;
-            break;
+            if (this.labels.at(i).hasClass('selected')) {
+                currentPage = i;
+                break;
+            }
         }
         let pageNumber = null;
         if (page === null) {
@@ -395,7 +396,7 @@ export class JGDraggable {
             if (options.stopPropagation) {
                 event.stopPropagation();
             }
-            if (options.prevantDefault) {
+            if (options.preventDefault) {
                 event.preventDefault();
             }
         }

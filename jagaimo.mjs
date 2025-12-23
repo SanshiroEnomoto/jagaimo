@@ -94,7 +94,7 @@ export class JGElement {
         }
         
         if (query[0] == '#') {
-            if (this.elem[0].attr('id') == query.substr(1)) {
+            if (this.elem[0].getAttribute('id') == query.substr(1)) {
                 return this;
             }
         }
@@ -251,7 +251,7 @@ export class JGElement {
                 }
             }
             else {   
-                const inputType = (this.elem[0].getAttribute('type') ?? '').toUpperCase();
+                const inputType = (e.getAttribute('type') ?? '').toUpperCase();
                 if ((inputType == 'COLOR') && (str.startsWith('rgb'))) {
                     // convert "rgb(r,g,b)" to "#RRGGBB"
                     const rgb = str.match(/\d+/g);

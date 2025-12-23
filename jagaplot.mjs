@@ -22,7 +22,7 @@ export class JGPlotAxisScale {
             labelColor: null, gridColor: null,
         };
         this.config = $.extend({}, defaults, options);
-        if (! this.config.lableColor) {
+        if (! this.config.labelColor) {
             this.config.labelColor = this.config.frameColor
         }
         if (! this.config.gridColor) {
@@ -113,11 +113,11 @@ export class JGPlotAxisScale {
             
             // order-normalization to make the width fit in range [N/2, 20*N]
             if (width > 20 * nticks) {
-                ticks = findTicksFor(min / 10.0, max / 10.0, tickCapacity, i+1);
+                let ticks = findTicksFor(min / 10.0, max / 10.0, tickCapacity, i+1);
                 return {first: ticks.first * 10.0, step: ticks.step * 10.0};
             }
             else if (width < nticks / 2.0) {
-                ticks = findTicksFor(min * 10.0, max * 10.0, tickCapacity, i+1);
+                let ticks = findTicksFor(min * 10.0, max * 10.0, tickCapacity, i+1);
                 return {first: ticks.first / 10.0, step: ticks.step / 10.0};
             }
             
@@ -127,19 +127,19 @@ export class JGPlotAxisScale {
             // here the upper tickCapacity should be greater than 5*N to avoid
             // subsequent I*0.5 normalization which results in ugly 
             // I*2.5 normalization
-                ticks = findTicksFor(min / 5.0, max / 5.0, tickCapacity, i+1);
+                let ticks = findTicksFor(min / 5.0, max / 5.0, tickCapacity, i+1);
                 return {first: ticks.first * 5.0, step: ticks.step * 5.0};
             }
             
             // factor-normalization(2) to make the width fit in range (N, 2*N]
             else if (width > 2.01 * nticks) {
             // I*2 normalization: twice at most //
-                ticks = findTicksFor(min / 2.0, max / 2.0, tickCapacity, i+1);
+                let ticks = findTicksFor(min / 2.0, max / 2.0, tickCapacity, i+1);
                 return {first: ticks.first * 2.0, step: ticks.step * 2.0};
             }
             else if (width < 0.99 * nticks) {
             // I*0.5 normalization: once at most //
-                ticks = findTicksFor(min * 2.0, max * 2.0, tickCapacity, i+1);
+                let ticks = findTicksFor(min * 2.0, max * 2.0, tickCapacity, i+1);
                 return {first: ticks.first / 2.0, step: ticks.step / 2.0};
             }
             
@@ -922,7 +922,7 @@ export class JGPlotFrame {
                 y: this.geom.marginTop,
                 length: this.geom.frameHeight,
                 scaleBarWidth: barWidth,
-                labelMargin: this.geom.LeftMargin,
+                labelMargin: this.geom.marginLeft,
                 labelPosition: 'right',
                 colorCoding: this.options.colorScale,
                 ticksOutwards: true,
@@ -1583,7 +1583,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         const y = graph.y ? graph.y : []
         const x = (graph.x?.length == y.length) ? graph.x : [... Array(y.length)].map((_, i)=>i);
         const defaultStyle = {
-            fillColor: this.style.fillColor || this.style.lineColr,
+            fillColor: this.style.fillColor || this.style.lineColor,
             fillOpacity: this.style.fillOpacity || 1,
             width: null,
         };
@@ -1625,7 +1625,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             let x0 = this._cx(x[i]-width/2);
             let x1 = this._cx(x[i]+width/2);
             let y0 = this._clip(this._cy(0), yc_min, yc_max);
-            let y1 = this._clip(this._cy(y[i], yc_min, yc_max));
+            let y1 = this._clip(this._cy(y[i]), yc_min, yc_max);
 
             $('<rect>', 'svg').appendTo(objgroup).attr({
                 x: x0, y: Math.min(y0, y1), width: x1-x0, height: Math.abs(y1-y0),
@@ -1730,7 +1730,10 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
     }
 
     drawStat(stat) {
-        if ((stat === null) || (stat === {})) {
+        if (
+            (stat === null) || (stat === undefined) || 
+            (typeof stat === 'object' && Object.keys(stat).length === 0)
+        ){
             this.frame.find('.jagaplot-stat').empty();
         }
         let title = stat.title;
