@@ -229,7 +229,7 @@ export class JGElement {
                     return false;
                 }
             }
-            else if (['RANGE'].includes(inputType)) {
+            else if (['NUMBER', 'RANGE'].includes(inputType)) {
                 return this.elem[0].valueAsNumber;
             }
             else {   
