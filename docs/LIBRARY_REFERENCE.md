@@ -2,10 +2,6 @@
 
 ## Reference Version
 
-This reference describes the public API of
-[`SanshiroEnomoto/jagaimo`](https://github.com/SanshiroEnomoto/jagaimo) on
-the `main` branch at commit `1829446` (May 26, 2026).
-
 Jagaimo is a dependency-free browser JavaScript library providing:
 
 - a lightweight DOM and SVG wrapper;
@@ -508,9 +504,6 @@ The following options are accepted by plot frame and/or widget construction.
 | `labelScaling` | `1` | Divides view-box size to scale apparent labels. |
 | `cursorDigits` | `5` | Pointer coordinate precision; values not greater than zero disable cursor reading. |
 | `rangeSelect` | zoom callback | Callback `(plotWidget, x0, x1, y0, y1)` for mouse/touch selected ranges. |
-
-When relying on automatic `JGPlotWidget` sizing in commit `1829446`, pass a
-`JGElement`, such as `$('#plot')`, rather than a selector string.
 
 ## `JGPlotAxisScale`
 

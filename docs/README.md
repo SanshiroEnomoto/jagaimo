@@ -56,3 +56,8 @@ Example from `test-plot-1.html`
 ```
 
 For more examples, see `test-plot-?.html` files.
+
+
+## Documentation
+- [Library Reference](LIBRARY_REFERENCE.md)
+- [Source Code Guide](SOURCE_GUIDE.md)
