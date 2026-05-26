@@ -1982,13 +1982,13 @@ export class JGPlotWidget extends JGWidget {
         }
 
         if (! (this.options.width > 0)) {
-            this.options.width = obj.get().offsetWidth;
+            this.options.width = this.obj.get().offsetWidth;
             if (! (this.options.width > 0)) {
                 this.options.width = 640;
             }
         }
         if (! (this.options.height > 0)) {
-            this.options.height = obj.get().offsetHeight;
+            this.options.height = this.obj.get().offsetHeight;
             if (! (this.options.height > 0)) {
                 this.options.height = this.options.width * 0.75;
             }
