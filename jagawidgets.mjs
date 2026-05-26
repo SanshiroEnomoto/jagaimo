@@ -126,7 +126,7 @@ export class JGTabWidget extends JGWidget {
         
         let pageNumber = this.pages.length-1;
         labelSpan.click(e => this.openPage($(e.target).closest('.jaga-tabLabel').text()));
-        labelSpan.onkeypress = (e => e.target.click());
+        labelSpan.get().onkeypress = (e => e.target.click());
         labelSpan.attr({'tabindex': '0'});
 
         this.openPage(pageNumber);

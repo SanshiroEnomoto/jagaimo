@@ -186,6 +186,7 @@ export class JGElement {
         else {
             this.find(sel).remove();
         }
+        this.length = this.elem.length;
         
         return this;
     }
@@ -311,10 +312,16 @@ export class JGElement {
     
     enabled(toEnable = null) {
         if (toEnable === null) {
-            if ((this.length == 0) || (typeof this.elem[0].enabled != 'boolean')) {
+            if (this.length == 0) {
                 return undefined;
             }
-            return this.elem[0].enabled;
+            else if (typeof this.elem[0].disabled == 'boolean') {
+                return ! this.elem[0].disabled;
+            }
+            else if (typeof this.elem[0].enabled == 'boolean') {
+                return this.elem[0].enabled;
+            }
+            return undefined;
         }
         for (let e of this.elem) {
             if (typeof e.disabled == 'boolean') {

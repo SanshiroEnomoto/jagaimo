@@ -9,6 +9,13 @@ JavaScript library for plotting and widgets
 
 ## Usage
 
+To run examples,
+```bash
+cd docs
+python3 -m http.server 8000
+firefox http://localhost:8000
+```
+
 #### Plotting
 Example from `test-plot-1.html`
 

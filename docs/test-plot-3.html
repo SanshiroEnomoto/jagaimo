@@ -13,7 +13,7 @@
 
 <script type="module">
     import { JG as $ } from './jagaimo/jagaimo.mjs';
-    import { JGPlotWidget } from './jagaimo/jagaplot.mjs';
+    import { JGPlot } from './jagaimo/jagaplot.mjs';
 
     window.addEventListener('DOMContentLoaded', function() {
         let plot1 = new JGPlot($('#canvas'), { grid: true });
@@ -34,8 +34,7 @@
             graph.y.push(y);
         }
         
-        // drawing 
-        
+        // drawing         
         let xmin = 0, xmax = 10, ymin = -1.5, ymax = 1.5;
         plot1.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });
         plot2.setRange(xmin, xmax, ymin, ymax, { xlog: false, ylog: false });

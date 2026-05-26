@@ -1588,7 +1588,6 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             width: null,
         };
         let style = $.extend({}, defaultStyle, graph.style);
-
         
         let frame = this.frame;
         if (frame.find('.jagaplot-plottingarea').size() == 0) {
@@ -1601,7 +1600,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         let fill = style.fillColor, stroke = 'none', opacity = style.fillOpacity;
         let width = style.width;
         if ((! width) || (width <= 0)) {
-            if (x < 2) {
+            if (x.length < 2) {
                 width = (geom.xmax - geom.xmin) / 2;
             }
             else {
@@ -1735,6 +1734,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
             (typeof stat === 'object' && Object.keys(stat).length === 0)
         ){
             this.frame.find('.jagaplot-stat').empty();
+            return this;
         }
         let title = stat.title;
         let doc = stat.contents;
@@ -1984,7 +1984,7 @@ export class JGPlotWidget extends JGWidget {
         if (! (this.options.width > 0)) {
             this.options.width = obj.get().offsetWidth;
             if (! (this.options.width > 0)) {
-                this.options.wWidth = 640;
+                this.options.width = 640;
             }
         }
         if (! (this.options.height > 0)) {
