@@ -1,6 +1,5 @@
 // colormap.mjs //
-// Author: Sanshiro Enomoto <sanshiro@uw.edu> //
-// Created on 8 August 2022 //
+// Created by Sanshiro Enomoto on 8 August 2022
 
 
 const ColorMapPalette_Parula = [

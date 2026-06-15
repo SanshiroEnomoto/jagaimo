@@ -1,6 +1,5 @@
 // jagaimo.mjs //
-// Author: Sanshiro Enomoto <sanshiro@uw.edu> //
-// Created on 2 November 2017 //
+// Created by Sanshiro Enomoto on 2 November 2017
 
 
 export class JGElement {

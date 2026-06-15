@@ -1,7 +1,6 @@
 // jagaplot.mjs //
-// Author: Sanshiro Enomoto <sanshiro@uw.edu> //
-// Created on 13 February 2019 //
-// Refactored on 25 April 2023 //
+// Created by Sanshiro Enomoto on 13 February 2019
+// Refactored by Sanshiro Enomoto on 25 April 2023
 
 import { JG as $, JGDateTime } from './jagaimo.mjs';
 import { JGWidget } from './jagawidgets.mjs';
