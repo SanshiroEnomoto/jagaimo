@@ -22,6 +22,7 @@ import {
     JGDialogWidget,
     JGMenuListWidget,
     JGPullDownWidget,
+    JGTreeWidget,
     JGHiddenWidget,
     JGInvisibleWidget,
     JGIndicatorWidget,
@@ -415,6 +416,45 @@ Wraps a `<select>` as a selection control with an updating heading label.
 | Method | Description |
 | --- | --- |
 | `setLabel(label)` | Updates the displayed hidden heading option using a wrapper or label text. |
+
+## `JGTreeWidget`
+
+Displays a nested JavaScript object or JSON text as a collapsible tree.
+
+```html
+<div id="tree">{"run": {"status": "done", "events": [1, 2, 3]}}</div>
+
+<script type="module">
+    import { JG as $ } from './jagaimo/jagaimo.mjs';
+    import { JGTreeWidget } from './jagaimo/jagawidgets.mjs';
+
+    new JGTreeWidget($('#tree'), { rootLabel: 'result' });
+</script>
+```
+
+You can also pass data directly:
+
+```js
+new JGTreeWidget($('#tree'), data, {
+    rootLabel: 'result',
+    expandedDepth: 2,
+    sortKeys: true
+});
+```
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `data` | `undefined` | Object to render when not passed as the second constructor argument. |
+| `rootLabel` | `''` | Optional label shown for the root node. |
+| `expandedDepth` | `Infinity` | Initial depth to expand. Use `0` to start fully collapsed. |
+| `sortKeys` | `false` | Sort object keys alphabetically before rendering. |
+| `parseJSON` | `true` | Parse the element text as JSON when no object is passed. |
+
+| Method | Description |
+| --- | --- |
+| `setData(data)` | Replaces the rendered data. |
+| `expandAll()` | Opens every branch. |
+| `collapseAll()` | Closes every branch. |
 
 ## `JGHiddenWidget` and `JGInvisibleWidget`
 
@@ -867,6 +907,7 @@ Principal styled classes include:
 | `.jaga-popup` | Popup and dialog base |
 | `.jaga-dialog-title`, `.jaga-dialog-content`, `.jaga-dialog-button-pane` | Dialog widget |
 | `.jaga-menulist` | Menu list widget |
+| `.jaga-treeWidget` | Collapsible tree widget |
 | `.jaga-fileicon`, `.jaga-fileicon-icon`, `.jaga-fileicon-label` | File icon widget |
 
 Plot appearance is predominantly configured through constructor options and

@@ -146,6 +146,7 @@ close active popup controls.
 | `JGDialogWidget` | Extends popups with title bars, buttons, and optional dragging. |
 | `JGMenuListWidget` | Adds menu-list styling and behavior to a list element. |
 | `JGPullDownWidget` | Builds a labeled selection control around a `<select>`. |
+| `JGTreeWidget` | Displays nested JavaScript objects or JSON text as a collapsible tree. |
 | `JGHiddenWidget` | Reveals elements by changing `display`. |
 | `JGInvisibleWidget` | Reveals elements by changing opacity without altering layout. |
 | `JGIndicatorWidget` | Shows a temporary status message and icon near a position. |

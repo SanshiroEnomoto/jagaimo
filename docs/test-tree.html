@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>JGTreeWidget test</title>
+    <link rel="stylesheet" type="text/css" href="../jagaimo.css">
+</head>
+<body>
+    <h1>JGTreeWidget</h1>
+
+    <h2>JSON text</h2>
+    <div id="jsonTree">{
+        "run": {
+            "status": "done",
+            "events": [
+                {"time": 0, "message": "started"},
+                {"time": 1.5, "message": "finished"}
+            ],
+            "metrics": {
+                "entries": 42,
+                "accepted": true,
+                "note": null
+            }
+        }
+    }</div>
+
+    <h2>Object data</h2>
+    <div id="objectTree"></div>
+
+    <script type="module">
+        import { JG as $ } from '../jagaimo.mjs';
+        import { JGTreeWidget } from '../jagawidgets.mjs';
+
+        new JGTreeWidget($('#jsonTree'), { rootLabel: 'result' });
+
+        const data = {
+            detector: {
+                channels: ['x', 'y', 'z'],
+                calibration: {
+                    version: '2026.06',
+                    coefficients: [1.0, -0.03, 0.0004]
+                }
+            },
+            files: {
+                input: 'sample.json',
+                output: 'summary.root'
+            }
+        };
+        new JGTreeWidget($('#objectTree'), data, { rootLabel: 'job', expandedDepth: 2 });
+    </script>
+</body>
+</html>

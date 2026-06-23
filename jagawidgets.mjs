@@ -568,6 +568,231 @@ export class JGPullDownWidget extends JGWidget {
 };
 
 
+export class JGTreeWidget extends JGWidget {
+    /***** DOM Structure *****
+      <div id="ObjId">{"key": "value"}</div>
+
+      constructor alternatives:
+        new JGTreeWidget($('#ObjId'));
+        new JGTreeWidget($('#ObjId'), data);
+        new JGTreeWidget($('#ObjId'), data, options);
+    /******/
+
+    constructor(obj, data=null, options={}) {
+        const defaults = {
+            data: undefined,
+            rootLabel: '',
+            expandedDepth: Infinity,
+            sortKeys: false,
+            parseJSON: true,
+        };
+
+        if ((arguments.length == 2) && $.isDict(data) && (
+            ('data' in data) || ('rootLabel' in data) || ('expandedDepth' in data) ||
+            ('sortKeys' in data) || ('parseJSON' in data)
+        )) {
+            options = data;
+            data = null;
+        }
+
+        super(obj, options);
+        this.options = $.extend({}, defaults, options);
+        this.obj.addClass('jaga-treeWidget');
+        this.expanded = {};
+        this.data = undefined;
+
+        if (this.options.data !== undefined) {
+            data = this.options.data;
+        }
+        if (data === null) {
+            data = this.readDataFromElement();
+        }
+        this.setData(data);
+    }
+
+    readDataFromElement() {
+        const text = this.obj.text();
+        if (this.options.parseJSON && (typeof text == 'string') && (text.trim() != '')) {
+            try {
+                return JSON.parse(text);
+            }
+            catch (e) {
+                return text;
+            }
+        }
+        return text;
+    }
+
+    setData(data) {
+        this.data = data;
+        this.expanded = {};
+        this.initializeExpandedState(this.data, 'root', 0);
+        this.render();
+        return this;
+    }
+
+    expandAll() {
+        this.setExpandedRecursive(this.data, 'root', true);
+        this.render();
+        return this;
+    }
+
+    collapseAll() {
+        this.setExpandedRecursive(this.data, 'root', false);
+        this.render();
+        return this;
+    }
+
+    initializeExpandedState(node, path, depth) {
+        if (! this.isBranch(node)) {
+            return;
+        }
+        this.expanded[path] = depth < this.options.expandedDepth;
+        for (let child of this.childrenOf(node)) {
+            this.initializeExpandedState(child.value, this.childPath(path, child.key), depth + 1);
+        }
+    }
+
+    setExpandedRecursive(node, path, isExpanded) {
+        if (! this.isBranch(node)) {
+            return;
+        }
+        this.expanded[path] = isExpanded;
+        for (let child of this.childrenOf(node)) {
+            this.setExpandedRecursive(child.value, this.childPath(path, child.key), isExpanded);
+        }
+    }
+
+    childPath(path, key) {
+        return path + '/' + encodeURIComponent(JSON.stringify(key));
+    }
+
+    isBranch(node) {
+        return $.isDict(node) || (node instanceof Array);
+    }
+
+    childrenOf(node) {
+        if (node instanceof Array) {
+            return node.map((value, key) => ({key, value}));
+        }
+        if ($.isDict(node)) {
+            let keys = Object.keys(node);
+            if (this.options.sortKeys) {
+                keys.sort();
+            }
+            return keys.map(key => ({key, value: node[key]}));
+        }
+        return [];
+    }
+
+    summaryOf(node) {
+        if (node instanceof Array) {
+            return `[${node.length}]`;
+        }
+        if ($.isDict(node)) {
+            const n = Object.keys(node).length;
+            return `{${n}}`;
+        }
+        if (typeof node == 'string') {
+            return JSON.stringify(node);
+        }
+        if (node === undefined) {
+            return 'undefined';
+        }
+        return JSON.stringify(node);
+    }
+
+    labelOf(key, node, isRoot=false) {
+        let label = '';
+        if (isRoot) {
+            label = this.options.rootLabel || '';
+        }
+        else if (typeof key == 'number') {
+            label = `[${key}]`;
+        }
+        else {
+            label = JSON.stringify(key);
+        }
+
+        if (! this.isBranch(node)) {
+            label += (label ? ': ' : '') + this.summaryOf(node);
+        }
+        return label || this.summaryOf(node);
+    }
+
+    render() {
+        this.obj.empty();
+        this.renderNode(this.data, {
+            key: null,
+            path: 'root',
+            prefix: '',
+            branch: '',
+            isLast: true,
+            isRoot: true,
+        });
+        return this;
+    }
+
+    renderNode(node, place) {
+        const isBranch = this.isBranch(node);
+        const isExpanded = this.expanded[place.path] !== false;
+        const row = $('<div>').addClass('jaga-treeWidget-row').appendTo(this.obj);
+        row.attr({
+            'data-jaga-tree-path': place.path,
+            'role': isBranch ? 'button' : 'treeitem',
+            'tabindex': isBranch ? '0' : undefined,
+            'aria-expanded': isBranch ? String(isExpanded) : undefined,
+        });
+
+        $('<span>').addClass('jaga-treeWidget-prefix').text(place.prefix + place.branch).appendTo(row);
+        $('<span>').addClass('jaga-treeWidget-toggle').text(
+            isBranch ? (isExpanded ? '\u25be' : '\u25b8') : ' '
+        ).appendTo(row);
+        $('<span>').addClass(isBranch ? 'jaga-treeWidget-label' : 'jaga-treeWidget-leaf').text(
+            this.labelOf(place.key, node, place.isRoot)
+        ).appendTo(row);
+        if (isBranch) {
+            $('<span>').addClass('jaga-treeWidget-summary').text(' ' + this.summaryOf(node)).appendTo(row);
+            row.bind('click', e => {
+                this.toggle(place.path);
+                e.stopPropagation();
+            });
+            row.bind('keydown', e => {
+                if ((e.key == 'Enter') || (e.key == ' ')) {
+                    this.toggle(place.path);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        }
+
+        if (! isBranch || ! isExpanded) {
+            return;
+        }
+
+        const children = this.childrenOf(node);
+        const childPrefix = place.prefix + (place.isRoot ? '' : (place.isLast ? '    ' : '\u2502   '));
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const isLast = (i == children.length - 1);
+            this.renderNode(child.value, {
+                key: child.key,
+                path: this.childPath(place.path, child.key),
+                prefix: childPrefix,
+                branch: isLast ? '\u2514\u2500\u2500 ' : '\u251c\u2500\u2500 ',
+                isLast,
+                isRoot: false,
+            });
+        }
+    }
+
+    toggle(path) {
+        this.expanded[path] = ! this.expanded[path];
+        this.render();
+    }
+};
+
+
 // hide by "display: none"; unlike InvisibleWidget, this is not "found" by mouseenter etc.
 export class JGHiddenWidget extends JGWidget {   
     constructor(obj, options={}) {

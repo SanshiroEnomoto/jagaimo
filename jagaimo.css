@@ -97,6 +97,35 @@
 }
 
 
+.jaga-treeWidget {
+    font-family: monospace;
+    white-space: pre;
+    line-height: 1.35;
+}
+.jaga-treeWidget-row {
+    min-height: 1.35em;
+}
+.jaga-treeWidget-row[role="button"] {
+    cursor: pointer;
+}
+.jaga-treeWidget-row[role="button"]:hover,
+.jaga-treeWidget-row[role="button"]:focus {
+    background: #f0f0f0;
+    outline: none;
+}
+.jaga-treeWidget-toggle {
+    display: inline-block;
+    width: 1.2em;
+    color: dimgray;
+}
+.jaga-treeWidget-label {
+    font-weight: bold;
+}
+.jaga-treeWidget-summary {
+    color: gray;
+}
+
+
 .jaga-fileicon {
     width: 7em;
     margin-right: 1em;
