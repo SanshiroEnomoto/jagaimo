@@ -4,7 +4,7 @@
 <head lang="en">
   <title>Jagaimo Plot</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" type="text/css" href="jagaimo.css">
+  <link rel="stylesheet" type="text/css" href="./jagaimo/jagaimo.css">
 </head>
 
 <body>
@@ -19,7 +19,7 @@
     import { JGPlotWidget } from './jagaimo/jagaplot.mjs';
 
     window.addEventListener('DOMContentLoaded', function() {
-        plot = new JGPlotWidget('#plot', {
+        let plot = new JGPlotWidget('#plot', {
             width:640, height:480, 
             bgcolor:"lightgray", plotcolor:"white",
             grid: true,
