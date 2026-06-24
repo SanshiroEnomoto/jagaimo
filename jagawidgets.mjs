@@ -737,10 +737,12 @@ export class JGTreeWidget extends JGWidget {
         const isBranch = this.isBranch(node);
         const isExpanded = this.expanded[place.path] !== false;
         const row = $('<div>').addClass('jaga-treeWidget-row').appendTo(this.obj);
+        const children = this.childrenOf(node);
+        const hasChild = children.length > 0;
         row.attr({
             'data-jaga-tree-path': place.path,
-            'role': isBranch ? 'button' : 'treeitem',
-            'tabindex': isBranch ? '0' : undefined,
+            'role': (isBranch && hasChild) ? 'button' : 'treeitem',
+            'tabindex': (isBranch && hasChild) ? '0' : undefined,
             'aria-expanded': isBranch ? String(isExpanded) : undefined,
         });
 
@@ -755,14 +757,6 @@ export class JGTreeWidget extends JGWidget {
             $('<span>').addClass('jaga-treeWidget-summary').text(' ' + this.summaryOf(node)).appendTo(row);
             row.bind('click', e => {
                 this.toggle(place.path);
-                e.stopPropagation();
-            });
-            row.bind('keydown', e => {
-                if ((e.key == 'Enter') || (e.key == ' ')) {
-                    this.toggle(place.path);
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
             });
         }
 
@@ -770,7 +764,6 @@ export class JGTreeWidget extends JGWidget {
             return;
         }
 
-        const children = this.childrenOf(node);
         const childPrefix = place.prefix + (place.isRoot ? '' : (place.isLast ? '    ' : '\u2502   '));
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
