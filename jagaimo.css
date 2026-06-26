@@ -124,6 +124,9 @@
 .jaga-treeWidget-summary {
     color: gray;
 }
+.jaga-treeWidget-prefix {
+    color: lightgray;
+}
 
 
 .jaga-fileicon {

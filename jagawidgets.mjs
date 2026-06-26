@@ -750,8 +750,8 @@ export class JGTreeWidget extends JGWidget {
         $('<span>').addClass('jaga-treeWidget-toggle').text(
             isBranch ? (isExpanded ? '\u25be' : '\u25b8') : ' '
         ).appendTo(row);
-        $('<span>').addClass(isBranch ? 'jaga-treeWidget-label' : 'jaga-treeWidget-leaf').text(
-            this.labelOf(place.key, node, place.isRoot)
+        $('<span>').addClass(isBranch ? 'jaga-treeWidget-label' : 'jaga-treeWidget-leaf').html(
+            $.sanitizeWeakly(this.labelOf(place.key, node, place.isRoot))
         ).appendTo(row);
         if (isBranch) {
             $('<span>').addClass('jaga-treeWidget-summary').text(' ' + this.summaryOf(node)).appendTo(row);
