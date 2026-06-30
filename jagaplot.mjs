@@ -2570,8 +2570,7 @@ export class JGPlotWidget extends JGWidget {
             let co = JGPlotWidget._screen2CanvasXY(ox, oy, this.svg.get(), this.obj.get());
             let cox = co.x - dx, coy = co.y - dy;
             plottingarea.attr({
-                'transform-origin': `${cox} ${coy}`,
-                'transform': `scale(${rx},${ry})translate(${dx},${dy})`,
+                'transform': `translate(${cox},${coy}) scale(${rx},${ry}) translate(${dx},${dy})`,
             });
         }
 
