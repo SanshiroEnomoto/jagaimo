@@ -441,6 +441,14 @@ export class JGElement {
         return this.length < 1 ? 0 : this.elem[0].getBoundingClientRect().height;
     }
 
+    clientWidth() {
+        return this.length < 1 ? 0 : this.elem[0].clientWidth;
+    }
+    
+    clientHeight() {
+        return this.length < 1 ? 0 : this.elem[0].clientHeight;
+    }
+
     screenX() {
         return this.length < 1 ? 0 : this.elem[0].getBoundingClientRect().left;
     }
