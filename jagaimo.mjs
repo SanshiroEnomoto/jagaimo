@@ -222,7 +222,7 @@ export class JGElement {
             }
             else if (['CHECKBOX', 'RADIO'].includes(inputType)) {
                 if (this.elem[0].checked) {
-                    const value = this.elem[0].getAttribute('value') ?? '';
+                    const value = this.elem[0].value ?? '';
                     return (value !== '') ? value : true;
                 }
                 else {
@@ -237,17 +237,18 @@ export class JGElement {
             }
         }
         for (let e of this.elem) {
+            const inputType = (e.getAttribute('type') ?? '').toUpperCase();
             if (e.tagName == 'SELECT') {
                 for (let opt of JG(e).find('option[value="' + str + '"]').enumerate()) {
                     opt.get().selected = true; 
                 }
             }
-            else if (['CHECKBOX', 'RADIO'].includes((e.getAttribute('type')??'').toUpperCase())) {
+            else if (['CHECKBOX', 'RADIO'].includes(inputType)) {
                 if (typeof str == 'boolean') {
                     e.checked = str;
                 }
                 else {
-                    e.value = str;
+                    e.checked = (String(e.value) === String(str));
                 }
             }
             else {   
@@ -439,14 +440,6 @@ export class JGElement {
     
     boundingClientHeight() {
         return this.length < 1 ? 0 : this.elem[0].getBoundingClientRect().height;
-    }
-
-    clientWidth() {
-        return this.length < 1 ? 0 : this.elem[0].clientWidth;
-    }
-    
-    clientHeight() {
-        return this.length < 1 ? 0 : this.elem[0].clientHeight;
     }
 
     screenX() {
