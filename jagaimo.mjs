@@ -253,7 +253,7 @@ export class JGElement {
             }
             else {   
                 const inputType = (e.getAttribute('type') ?? '').toUpperCase();
-                if ((inputType == 'COLOR') && (str.startsWith('rgb'))) {
+                if ((inputType == 'COLOR') && (typeof(str) == 'string') && str.startsWith('rgb')) {
                     // convert "rgb(r,g,b)" to "#RRGGBB"
                     const rgb = str.match(/\d+/g);
                     if (rgb && (rgb.length >= 3)) {
