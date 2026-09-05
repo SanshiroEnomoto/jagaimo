@@ -91,24 +91,12 @@ export class JGElement {
         if ((this.elem.length < 1) || (query.length < 1)) {
             return new JGElement(null);
         }
-        
-        if (query[0] == '#') {
-            if (this.elem[0].getAttribute('id') == query.substr(1)) {
-                return this;
-            }
+        let elem = this.elem[0].closest(query);
+        if (! elem) {
+            return new JGElement(null);
         }
-        else if (query[0] == '.') {
-            if (this.elem[0].classList?.contains(query.substr(1))) {
-                return this;
-            }
-        }
-        else {
-            if (query.toUpperCase() == this.elem[0].tagName.toUpperCase()) {
-                return this;
-            }
-        }
-        
-        return this.parent().closest(query);
+
+        return new JGElement(elem);
     }
     
     
