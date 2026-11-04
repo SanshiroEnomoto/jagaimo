@@ -932,19 +932,27 @@ export class JGPlotFrame {
         if (this.options.colorScale !== null) {
             const barWidth = this.options.colorBarWidth;
             this.options.marginRight += this.options.marginLeft + barWidth*2;
-            this.scaleZ = new JGPlotColorBarScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, {
+            const opts = {
                 x: this.geom.marginLeft + this.geom.frameWidth + 2*barWidth,
                 y: this.geom.marginTop,
                 length: this.geom.frameHeight,
                 scaleBarWidth: barWidth,
                 labelMargin: this.geom.marginLeft,
                 labelPosition: 'right',
-                colorCoding: this.options.colorScale,
                 ticksOutwards: true,
                 frameColor: this.options.labelColor, // LabelColor on purpose
                 labelColor: this.options.labelColor,
                 title: '',
-            });
+            };
+            if (this.options.colorScale == 'NoColorBar') {
+                this.scaleZ = new JGPlotAxisScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, opts);
+            }
+            else {
+                this.scaleZ = new JGPlotColorBarScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, {
+                    ...opts,
+                    colorCoding: this.options.colorScale,
+                });
+            }
         }
         else {
             this.scaleZ = new JGPlotScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, {});
