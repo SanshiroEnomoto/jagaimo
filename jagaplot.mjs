@@ -7,7 +7,120 @@ import { JGWidget } from './jagawidgets.mjs';
 import { ColorMap } from './colormap.mjs';
 
 
-export class JGPlotAxisScale {
+export class JGPlotScale {
+    constructor(min, max, isLog, options={}) {
+        const defaults = {};
+        this.config = $.extend({}, defaults, options);
+        
+        this.min = 0;
+        this.max = 1;
+        this.isLog = false;
+        
+        this.setRange(min, max, isLog);
+    }
+
+    fractionOf(value) {
+        let r;
+        if (this.isLog) {
+            r = Math.log10(value / this.min) / Math.log10(this.max / this.min);
+        }
+        else {
+            r = (value - this.min) / (this.max - this.min);
+        }
+        return r;
+    }
+    
+    setOptions(options) {
+        $.extend(this.config, options);
+    }
+
+    setRange(min, max, isLog=false) {
+        let x0 = parseFloat(min);
+        let x1 = parseFloat(max);
+        if (isNaN(x0)) x0 = this.min;
+        if (isNaN(x1)) x1 = this.max;
+        
+        if (Math.abs(x1 - x0) < 1e-20 * (Math.abs(x0) + Math.abs(x1))) {
+            [x0, x1] = JGPlotScale.findRangeFromValues(x0, x1);
+        }
+
+        this.min = Math.min(x0, x1);
+        this.max = Math.max(x0, x1);
+        this.isLog = isLog;
+
+        if (this.isLog) {
+            if (this.max <= 0) {
+                this.max = 10;
+                this.min = 0.1;
+            }
+            else if (this.min <= 0) {
+                this.min = Math.min(0.5, this.max / 1000.0);
+            }
+        }
+
+        return this;
+    }
+
+    static findRangeFromValues(minValue, maxValue, opts={}) {
+        const defaults = {
+            isLog: false,
+            lowerMargin: 0.03,
+            upperMargin: 0.03,
+            stickyZero: true,
+        };
+        let options = $.extend({}, defaults, opts);
+
+        let x0 = parseFloat(minValue);
+        let x1 = parseFloat(maxValue);
+        let lowerMargin = parseFloat(options.lowerMargin);
+        let upperMargin = parseFloat(options.upperMargin);
+
+        if (options.isLog) {
+            if (x1 <= 0) {
+                x1 = 10;
+                x0 = 0.1;
+            }
+            else if (x0 <= 0) {
+                x1 = 3 * x1;
+                x0 = Math.min(0.5, x1/100);
+            }
+            else {
+                let width = x1 / x0;
+                x1 = x1 * Math.pow(width, upperMargin);
+                x0 = x0 / Math.pow(width, lowerMargin);
+            }
+        }
+        else {
+            let width = x1 - x0;
+            let sum = Math.abs(x0) + Math.abs(x1);
+            if (sum < 1e-20) {
+                x0 = -1;
+                x1 = 1;
+            }
+            else if (width < 1e-6 * sum) {
+                let center = (x0 + x1)/2;
+                x0 = center - 0.1 * sum;
+                x1 = center + 0.1 * sum;
+            }
+            else {
+                if (options.stickyZero && (x0 >= 0) && (x0 < lowerMargin * width)) {
+                    x0 = 0;
+                }
+                else {
+                    x0 -= lowerMargin * width;
+                }
+            }
+            x1 += upperMargin * width;
+        }
+
+        return [ x0, x1 ];
+    }
+    
+    draw(g, options={}) {}
+}
+
+    
+export class JGPlotAxisScale extends JGPlotScale {
     constructor(min, max, isLog, options={}) {
         const defaults = {
             x: 0, y: 0, length: 100, // axis position in parent coordinate
@@ -20,7 +133,8 @@ export class JGPlotAxisScale {
             frameColor: 'black', frameThickness: 2,
             labelColor: null, gridColor: null,
         };
-        this.config = $.extend({}, defaults, options);
+        super(min, max, isLog, $.extend({}, defaults, options));
+
         if (! this.config.labelColor) {
             this.config.labelColor = this.config.frameColor
         }
@@ -45,45 +159,9 @@ export class JGPlotAxisScale {
             }
         }
         
-        this.min = 0;
-        this.max = 1;
-        this.isLog = false;
         this.ticklist = null;
-        
-        this.setRange(min, max, isLog);
     }
 
-    setOptions(options) {
-        $.extend(this.config, options);
-    }
-    
-    setRange(min, max, isLog=false) {
-        let x0 = parseFloat(min);
-        let x1 = parseFloat(max);
-        if (isNaN(x0)) x0 = this.min;
-        if (isNaN(x1)) x1 = this.max;
-        
-        if (Math.abs(x1 - x0) < 1e-20 * (Math.abs(x0) + Math.abs(x1))) {
-            [x0, x1] = JGPlotAxisScale.findRangeFromValues(x0, x1);
-        }
-
-        this.min = Math.min(x0, x1);
-        this.max = Math.max(x0, x1);
-        this.isLog = isLog;
-
-        if (this.isLog) {
-            if (this.max <= 0) {
-                this.max = 10;
-                this.min = 0.1;
-            }
-            else if (this.min <= 0) {
-                this.min = Math.min(0.5, this.max / 1000.0);
-            }
-        }
-
-        return this;
-    }
-    
     _find_ticks() {
         if (this.config.numberOfTicks <= 0) {
             return { ticks: [], subticks: [], min: this.min, max: this.max, isLog: this.isLog };
@@ -667,61 +745,6 @@ export class JGPlotAxisScale {
             drawHorizontal(frame, this.ticklist, config, this.isLog);
         }
     }
-
-    static findRangeFromValues(minValue, maxValue, opts={}) {
-        const defaults = {
-            isLog: false,
-            lowerMargin: 0.03,
-            upperMargin: 0.03,
-            stickyZero: true,
-        };
-        let options = $.extend({}, defaults, opts);
-
-        let x0 = parseFloat(minValue);
-        let x1 = parseFloat(maxValue);
-        let lowerMargin = parseFloat(options.lowerMargin);
-        let upperMargin = parseFloat(options.upperMargin);
-
-        if (options.isLog) {
-            if (x1 <= 0) {
-                x1 = 10;
-                x0 = 0.1;
-            }
-            else if (x0 <= 0) {
-                x1 = 3 * x1;
-                x0 = Math.min(0.5, x1/100);
-            }
-            else {
-                let width = x1 / x0;
-                x1 = x1 * Math.pow(width, upperMargin);
-                x0 = x0 / Math.pow(width, lowerMargin);
-            }
-        }
-        else {
-            let width = x1 - x0;
-            let sum = Math.abs(x0) + Math.abs(x1);
-            if (sum < 1e-20) {
-                x0 = -1;
-                x1 = 1;
-            }
-            else if (width < 1e-6 * sum) {
-                let center = (x0 + x1)/2;
-                x0 = center - 0.1 * sum;
-                x1 = center + 0.1 * sum;
-            }
-            else {
-                if (options.stickyZero && (x0 >= 0) && (x0 < lowerMargin * width)) {
-                    x0 = 0;
-                }
-                else {
-                    x0 -= lowerMargin * width;
-                }
-            }
-            x1 += upperMargin * width;
-        }
-
-        return [ x0, x1 ];
-    }
 };
     
 
@@ -740,14 +763,7 @@ export class JGPlotColorBarScale extends JGPlotAxisScale {
     }
 
     colorNameOf(value) {
-        let r;
-        if (this.isLog) {
-            r = Math.log10(value / this.min) / Math.log10(this.max / this.min);
-        }
-        else {
-            r = (value - this.min) / (this.max - this.min);
-        }
-        return this.colorMap.colorNameOf(r);
+        return this.colorMap.colorNameOf(this.fractionOf(value));
     }
     
     //... TODO: do not do this everytime. <g> should be in the constructor
@@ -931,17 +947,15 @@ export class JGPlotFrame {
             });
         }
         else {
-            this.scaleZ = null;
+            this.scaleZ = new JGPlotScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, {});
         }
         
         this.geom.xmin = this.scaleX.min;
         this.geom.xmax = this.scaleX.max;
         this.geom.ymin = this.scaleY.min;
         this.geom.ymax = this.scaleY.max;
-        if (this.scaleZ) {
-            this.geom.zmin = this.scaleZ.min;
-            this.geom.zmax = this.scaleZ.max;
-        }
+        this.geom.zmin = this.scaleZ.min;
+        this.geom.zmax = this.scaleZ.max;
         this.clear();
     }
     
@@ -965,18 +979,16 @@ export class JGPlotFrame {
 
         this.scaleX.setRange(x0, x1, opts.xlog);
         this.scaleY.setRange(y0, y1, opts.ylog);
+        this.scaleZ.setRange(z0 ?? this.geom.zmin, z1 ?? this.geom.zmax, opts.zlog);
         this.geom.xmin = this.scaleX.min;
         this.geom.xmax = this.scaleX.max;
         this.geom.xlog = this.scaleX.isLog;
         this.geom.ymin = this.scaleY.min;
         this.geom.ymax = this.scaleY.max;
         this.geom.ylog = this.scaleY.isLog;
-        if (this.scaleZ) {
-            this.scaleZ.setRange(z0 ?? this.geom.zmin, z1 ?? this.geom.zmax, opts.zlog);
-            this.geom.zmin = this.scaleZ.min;
-            this.geom.zmax = this.scaleZ.max;
-            this.geom.zlog = this.scaleZ.isLog;
-        }
+        this.geom.zmin = this.scaleZ.min;
+        this.geom.zmax = this.scaleZ.max;
+        this.geom.zlog = this.scaleZ.isLog;
 
         this.labels.grid = opts.grid;
         this.labels.stat = opts.stat;
@@ -1008,9 +1020,7 @@ export class JGPlotFrame {
     }    
 
     setZTitle(title) {
-        if (this.scaleZ) {
-            this.scaleZ.setOptions({'title': title});
-        }
+        this.scaleZ.setOptions({'title': title});
         return this;
     }    
 
@@ -1135,9 +1145,7 @@ export class JGPlotFrame {
         }
 
         // Z Axis //
-        if (this.scaleZ) {
-            this.scaleZ.draw(frame);
-        }
+        this.scaleZ.draw(frame);
     }
 
     
@@ -1289,24 +1297,19 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
     }
 
     
-    drawHistogram2d(hist2d) {
+    async drawHistogram2d(hist2d) {
+        const defaultStyle = {
+            color: this.style.lineColor,
+            opacity: this.style.fillOpacity,
+        };
+        const style = $.extend({}, defaultStyle, hist2d.style);
+        
         const xmin = parseFloat(hist2d.xbins?.min ?? 0);
         const xmax = parseFloat(hist2d.xbins?.max ?? xmin+1);
         const ymin = parseFloat(hist2d.ybins?.min ?? 0);
         const ymax = parseFloat(hist2d.ybins?.max ?? ymin+1);
         const counts = hist2d.counts ?? [[]];
         
-        if (! this.scaleZ) {
-            return this;
-        }
-        
-        let frame = this.frame;
-        if (frame.find('.jagaplot-plottingarea').size() == 0) {
-            this.drawFrame();
-        }
-        let plottingarea = frame.find('.jagaplot-plottingarea');
-        let objgroup = $('<g>', 'svg').appendTo(plottingarea);
-
         const ynbins = counts.length;
         if (ynbins == 0) {
             return this;
@@ -1315,23 +1318,72 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         if (xnbins == 0) {
             return this;
         }
-
+        
+        const skip_zeros = hist2d.style?.skip_zeros ?? false;
+        const is_box = (hist2d.style?.rendering == 'box');
+        
+        let objgroup = $('<g>', 'svg');
         const xstep = (xmax - xmin) / xnbins, ystep = (ymax - ymin) / ynbins;
+        const yieldDy = Math.floor(1000.0 / xnbins) + 1;
+        
+        let rect_style = {
+            'stroke': 'none',
+            'fill': style.color,
+        };
+        if (style.opacity < 1) {
+            rect_style['fill-opacity'] = style.opacity;
+        }
+        
+        let x0, x1, y0, y1, color;
         for (let iy = 0; iy < ynbins; iy++) {
             for (let ix = 0; ix < xnbins; ix++) {
-                const x0 = this._cx(xmin + ix * xstep);
-                const x1 = this._cx(xmin + (ix+1) * xstep);
-                const y0 = this._cy(ymin + iy * ystep);
-                const y1 = this._cy(ymin + (iy+1) * ystep);
                 const z = counts[iy][ix];
+                if (skip_zeros && (z == 0)) {
+                    continue;
+                }
 
-                let cell = $('<rect>', 'svg').appendTo(objgroup).attr({
+                if (is_box) {
+                    const r = this._clip(this.scaleZ.fractionOf(z), 0, 1);
+                    const d = (1-Math.sqrt(r))/2;
+                    x0 = this._cx(xmin + (ix+d) * xstep);
+                    x1 = this._cx(xmin + (ix+1-d) * xstep);
+                    y0 = this._cy(ymin + (iy+d) * ystep);
+                    y1 = this._cy(ymin + (iy+1-d) * ystep);
+                }
+                else {
+                    x0 = this._cx(xmin + ix * xstep);
+                    x1 = this._cx(xmin + (ix+1) * xstep);
+                    y0 = this._cy(ymin + iy * ystep);
+                    y1 = this._cy(ymin + (iy+1) * ystep);
+                    const color = this.scaleZ.colorNameOf(z);
+                    rect_style['fill'] = color;
+                    rect_style['stroke'] = color;
+                }
+                    
+                $('<rect>', 'svg').appendTo(objgroup).attr({
                     x: x0, y: y1, width: x1-x0, height: y0-y1,
-                    'fill': this.scaleZ.colorNameOf(z),
-                    'stroke': this.scaleZ.colorNameOf(z),
+                    ...rect_style,
                 });
             }
+
+            // drawing a 2d histogram might be slow; let the browser handle other (input) events
+            if ((iy+1) % yieldDy == 0) {
+                if (globalThis.scheduler?.yield) {
+                    await globalThis.scheduler.yield();
+                }
+                else {
+                    // as of Nov 2026, Safari does not have scheduler.yield
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
         }
+
+        let frame = this.frame;
+        if (frame.find('.jagaplot-plottingarea').size() == 0) {
+            this.drawFrame();
+        }
+        let plottingarea = frame.find('.jagaplot-plottingarea');
+        objgroup.appendTo(plottingarea);
         
         return this;
     }
