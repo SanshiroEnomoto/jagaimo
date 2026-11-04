@@ -754,12 +754,13 @@ export class JGPlotColorBarScale extends JGPlotAxisScale {
         const defaults = {
             ticksOutwards: true,
             colorCoding: 'Parula',
+            colorsReversed: false,
             scaleBarWidth: 10,
             numberOfSlices: 32,
         };
         super(min, max, isLog, $.extend({}, defaults, options));
         
-        this.colorMap = new ColorMap(this.config.colorCoding);
+        this.colorMap = new ColorMap(this.config.colorCoding, { reversed: this.config.colorsReversed });
     }
 
     colorNameOf(value) {
@@ -814,7 +815,7 @@ export class JGPlotFrame {
             x0: 0, x1: 1, y0: 0, y1: 1,           // initial coordinate
             dateFormat: null, logX: false, logY: false,
             grid: false, stat: true, ticksX: 10, ticksY: 10, ticksOutwards: true,
-            z0: 0, z1: 1, ticksZ: 10, colorScale: null,
+            z0: 0, z1: 1, ticksZ: 10, colorScale: null, colorScaleReversed: false,
             plotMarginColor: 'none', plotAreaColor: 'none',
             frameColor: 'black', frameThickness: 2, axisThickness: 1,
             labelColor: null, gridColor: null,
@@ -951,6 +952,7 @@ export class JGPlotFrame {
                 this.scaleZ = new JGPlotColorBarScale(this.geom.zmin, this.geom.zmax, this.geom.zlog, {
                     ...opts,
                     colorCoding: this.options.colorScale,
+                    colorsReversed: this.options.colorScaleReversed,
                 });
             }
         }
@@ -2019,7 +2021,7 @@ export class JGPlotWidget extends JGWidget {
             labelScaling: 1,
             x0: 0, x1: 1, y0: 0, y1: 1,           // initial coordinate
             dateFormat: null, logX: false, logY: false,
-            colorScale: null,
+            colorScale: null, colorScaleReversed: false,
             grid: false, stat: true, ticksX: 10, ticksY: 10,
             plotMarginColor: 'none', plotAreaColor: 'none',
             frameColor: 'black', frameThickness: 0, ticksOutwards: true,

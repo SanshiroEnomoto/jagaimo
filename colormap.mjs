@@ -1662,7 +1662,9 @@ function hsv2rgb(h, s, v) {  // h: [0, 360], s: [0, 1], v: [0, 1]
 }
 
 
-export let ColorMap = function(name) {
+export let ColorMap = function(name, options={}) {
+    this.colorsReversed = options.reversed ?? false;
+    
     this.palette = null;
     this.underflowColor = null;
     this.overflowColor = null;
@@ -1734,6 +1736,9 @@ export let ColorMap = function(name) {
     }
 
     this.colorNameOf = function(x) {
+        if (this.colorsReversed) {
+            x = 1 - x;
+        }
         if (x < 0) {
             if (this.isOutOfRangeIndicated && this.underflowColor) {
                 return this.underflowColor;
