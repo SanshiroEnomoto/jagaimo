@@ -66,6 +66,7 @@ export class JGPlotScale {
             isLog: false,
             lowerMargin: 0.03,
             upperMargin: 0.03,
+            minWidth: 0,
             stickyZero: true,
         };
         let options = $.extend({}, defaults, opts);
@@ -85,6 +86,9 @@ export class JGPlotScale {
                 x0 = Math.min(0.5, x1/100);
             }
             else {
+                if ((x1 - x0) < options.minWidth) {
+                    x1 = x0 + options.minWidth;
+                }
                 let width = x1 / x0;
                 x1 = x1 * Math.pow(width, upperMargin);
                 x0 = x0 / Math.pow(width, lowerMargin);
@@ -93,12 +97,17 @@ export class JGPlotScale {
         else {
             let width = x1 - x0;
             let sum = Math.abs(x0) + Math.abs(x1);
-            if (sum < 1e-20) {
+            if (width < options.minWidth) {
+                let center = (x0 + x1) / 2;
+                x0 = center - 0.5 * options.minWidth;
+                x1 = center + 0.5 * options.minWidth;
+            }
+            else if (sum < 1e-20) {
                 x0 = -1;
                 x1 = 1;
             }
             else if (width < 1e-6 * sum) {
-                let center = (x0 + x1)/2;
+                let center = (x0 + x1) / 2;
                 x0 = center - 0.1 * sum;
                 x1 = center + 0.1 * sum;
             }
@@ -1334,7 +1343,7 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
         
         let objgroup = $('<g>', 'svg');
         const xstep = (xmax - xmin) / xnbins, ystep = (ymax - ymin) / ynbins;
-        const yieldDy = Math.floor(1000.0 / xnbins) + 1;
+        const yieldDy = Math.floor(100.0 / xnbins) + 1;
         
         let rect_style = {
             'stroke': 'none',
