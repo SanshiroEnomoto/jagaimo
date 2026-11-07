@@ -848,14 +848,15 @@ export class JGPlotFrame {
         }
 
         this.uid = JGPlot.plotId++;
-        this.frame = $('<g>', 'svg').appendTo(parent_g);
+        this.frameContainer = $('<g>', 'svg').appendTo(parent_g);
         const plotWidth = parseFloat(this.options.width);
         const plotHeight = parseFloat(this.options.height);
         const x00 = parseFloat(this.options.x);
         const y00 = parseFloat(this.options.y);
         if ((x00 !== 0) || (y00 != 0)) {
-            this.frame.attr('transform', `translate(${x00},${y00})`);
+            this.frameContainer.attr('transform', `translate(${x00},${y00})`);
         }
+        this.frame = $('<g>', 'svg').appendTo(this.frameContainer);
 
         this.geom = {
             width: plotWidth,
@@ -976,6 +977,14 @@ export class JGPlotFrame {
         this.geom.zmin = this.scaleZ.min;
         this.geom.zmax = this.scaleZ.max;
         this.clear();
+    }
+
+    enterFrameBuffer() {
+        this.frame = $('<g>', 'svg');
+    }
+    
+    exitFrameBuffer() {
+        this.frameContainer.empty().append(this.frame);
     }
     
     clear() {
@@ -1396,7 +1405,6 @@ export class JGPlot extends JGPlotFrame { // to be embedded in <SVG>
                 }
             }
         }
-
         let frame = this.frame;
         if (frame.find('.jagaplot-plottingarea').size() == 0) {
             this.drawFrame();
@@ -2115,6 +2123,14 @@ export class JGPlotWidget extends JGWidget {
         return this;
     }
 
+    enterFrameBuffer() {
+        return this.plot.enterFrameBuffer();
+    }
+    
+    exitFrameBuffer() {
+        return this.plot.exitFrameBuffer();
+    }
+    
     clear(removeItems=true) {
         if (removeItems) {
             this.items = [];
@@ -2131,14 +2147,24 @@ export class JGPlotWidget extends JGWidget {
         this._drawItems();
     }
     
+    async updateAsync() {
+        const range = this.plot.getRange();
+        this.plot.setRange(range.xmin, range.xmax, range.ymin, range.ymax, range.zmin, range.zmax, {});
+        this.plot.drawFrame();
+        await this._drawItemsAsync();
+    }
+    
     getRange() {
         return this.plot.getRange();
     }
     
     setRange(x0, x1, y0, y1, z0=null, z1=null, options={}) {
         this.plot.setRange(x0, x1, y0, y1, z0, z1, options);
-        this.plot.drawFrame();
-        this._drawItems();
+        if (options.update ?? true) {
+            this.plot.drawFrame();
+            this._drawItems();
+        }
+
         this.obj.attr('cursorLabel', '');
         return this;
     }
@@ -2196,7 +2222,7 @@ export class JGPlotWidget extends JGWidget {
     }
 
     addHistogram2d(itemData) {
-        const drawer = data => { this.plot.drawHistogram2d(data); };
+        const drawer = async data => { await this.plot.drawHistogram2d(data); };
         this.items.push({drawer: drawer, data: itemData}); // no deep-copy on purpose 
         drawer(itemData);
         return this;
@@ -2302,6 +2328,12 @@ export class JGPlotWidget extends JGWidget {
     _drawItems() {
         for (let item of this.items) {
             item.drawer(item.data);
+        }
+    }
+    
+    async _drawItemsAsync() {
+        for (let item of this.items) {
+            await item.drawer(item.data);
         }
     }
     
